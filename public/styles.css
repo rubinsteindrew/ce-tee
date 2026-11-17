@@ -593,3 +593,4 @@ body.menu-open { overflow: hidden; }
 .reserve .kicker { padding-right: 76px; }
 .nav-links .menu-only { display: none; }
 @media (max-width: 1020px) { .nav-links .menu-only { display: block; color: var(--sun); } }
+.static-host .nav-acct, .static-host .foot-links a[href="/account"], .static-host .gate-acct { display: none !important; }

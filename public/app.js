@@ -44,11 +44,18 @@
     $$('.nav-links a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')) { setMenu(false); menuBtn.focus(); } });
   }
-  let me = null;
-  const meReady = fetch('/api/auth/me').then((r) => r.json()).then((d) => { me = d.user; return me; }).catch(() => null);
+  let me = null, isStatic = false;
+  // On a static host (GitHub Pages) there is no /api: accounts and booking are switched off.
+  const meReady = fetch('/api/auth/me').then((r) => { if (!r.ok) throw new Error('no api'); return r.json(); })
+    .then((d) => { me = d.user; return me; })
+    .catch(() => {
+      isStatic = true;
+      document.documentElement.classList.add('static-host');
+      return null;
+    });
   meReady.then((u) => {
     const links = $('#navLinks');
-    if (links) {   // the phone menu also needs a way into the account page
+    if (links && !isStatic) {   // the phone menu also needs a way into the account page
       const a = document.createElement('a');
       a.href = '/account'; a.className = 'menu-only'; a.textContent = u ? 'My account' : 'Sign in';
       links.append(a);
@@ -344,7 +351,13 @@
   };
 
   if (upList || catalog || list) {
-    fetch('/api/trips').then((r) => r.json()).then((data) => {
+    const visibleTrips = (all) => all.filter((t) => t.status === 'published' || t.status === 'soldout').map((t) => {
+      const spotsLeft = Math.max(0, (t.capacity || 0) - (t.booked || 0));
+      return { ...t, spotsLeft, status: t.status === 'soldout' || spotsLeft === 0 ? 'soldout' : 'published' };
+    }).sort((a, b) => a.startDate.localeCompare(b.startDate));
+    fetch('/api/trips').then((r) => { if (!r.ok) throw new Error('no api'); return r.json(); })
+      .catch(() => fetch('/trips.json').then((r) => r.json()).then((all) => ({ trips: visibleTrips(all), payments: 'static' })))
+      .then((data) => {
       trips = data.trips || []; payments = data.payments;
       const today = new Date().toISOString().slice(0, 10);
       const upcoming = trips.filter((t) => t.endDate >= today);
@@ -417,6 +430,8 @@
       $('#reserveTitle').textContent = current.name;
       $('#reserveMeta').textContent = `${dates(current.startDate, current.endDate)} · ${current.credits} CE hours · ${money(current.price)} per person`;
       form.hidden = !u; gate.hidden = !!u;
+      $('#gateSoon').hidden = !isStatic;
+      document.querySelectorAll('#reserveGate .btn').forEach((x) => { x.hidden = isStatic; });
       if (!u) {
         const next = encodeURIComponent(`/trips#trip-${current.id}`);
         $('#gateIn').href = `/account?next=${next}`;
