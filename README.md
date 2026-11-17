@@ -34,29 +34,26 @@ Open http://localhost:4173. Settings live in `.env` (never commit it).
 Until `RESEND_API_KEY` is set, emails (confirmation links, password resets) are printed in the server log
 instead of being sent. Locally that is your terminal; on Render it is the service's **Logs** tab.
 
-## Putting it live at ce-tee.com
+## How ce-tee.com is hosted (GitHub Pages)
 
-GitHub Pages can't run this site (it only serves fixed pages, and this site has sign-in, an admin desk and
-payments). Render runs it straight from your GitHub repo instead, and redeploys on every push.
+- Every push to `main` runs `.github/workflows/pages.yml`, which publishes `public/` to GitHub Pages in about a
+  minute. Watch it under the repo's **Actions** tab.
+- Trips on the live site come from `data/trips.sample.json`. To add, change or hide a trip, edit that file
+  (`"status": "archived"` or `"draft"` hides one) and push.
+- GitHub Pages only serves files, so the account pages, the admin desk and online booking are switched off there,
+  and the Reserve button says "Online reservations open soon". They work when the site runs on a server
+  (`node server.js` locally, or a host like Render using `render.yaml`), or once a hosted backend such as
+  Supabase is connected.
+- DNS at GoDaddy: four **A** records for `@` (185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153)
+  and a **CNAME** `www` pointing to `rubinsteindrew.github.io`. The Microsoft 365 email records (MX, autodiscover,
+  SPF, DMARC, DKIM) are separate; leave them alone.
+- HTTPS: once GitHub has issued the certificate, tick **Enforce HTTPS** in the repo's Settings > Pages.
 
-1. **GitHub:** create a private repository and push this folder to it.
-2. **Render** (render.com): sign in with GitHub, choose **New > Blueprint**, pick the repo. It reads
-   `render.yaml` and creates the server with a 1 GB disk for accounts and trips (Starter plan, about $7/month
-   plus a few cents for the disk). It generates `SESSION_SECRET` for you.
-3. **Custom domain:** in the Render service, **Settings > Custom Domains**, add `ce-tee.com` and `www.ce-tee.com`.
-   Render shows the exact DNS records to use.
-4. **GoDaddy DNS** (My Products > ce-tee.com > DNS): add the records Render shows. Usually that is
-   - an **A** record, name `@`, pointing to the IP Render gives you, replacing GoDaddy's default "Parked" A record, and
-   - a **CNAME** record, name `www`, pointing to `your-service.onrender.com`.
+## Running the full version on a server instead
 
-   Leave your MX records alone so `@ce-tee.com` email keeps working. DNS can take a few minutes to a few hours;
-   Render issues the HTTPS certificate on its own once it sees the records.
-5. **Email (needed for admins):** create a free account at resend.com, add the domain `ce-tee.com`, and add the
-   DNS records Resend shows to GoDaddy as well. Then put the API key in Render as `RESEND_API_KEY`.
-6. **First admin:** sign up at `https://ce-tee.com/account` with your `@ce-tee.com` email, click the link in the
-   confirmation email, and the Admin link appears.
-
-After that, every `git push` updates the live site in about a minute.
+`render.yaml` sets up Render (about $7/month) with accounts, the admin desk and booking. To switch, create the
+service from the repo (**New > Blueprint**), add `ce-tee.com` as a custom domain there, and point the GoDaddy
+records at Render instead of GitHub. Admin emails also need an email service (for example Resend, `RESEND_API_KEY`).
 
 ## Turning on Stripe deposits
 
