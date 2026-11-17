@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<style>html{background:#14261d}</style>
+<script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
+<title>Your account — CE &amp; Tees</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body data-page="account">
+
+<header class="nav" id="nav">
+  <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/day">The day</a>
+    <a href="/ce">The CE</a>
+    <a href="/trips">Trips</a>
+    <a href="/trips#faq">Questions</a>
+  </nav>
+  <div class="nav-right">
+    <a class="nav-acct" id="navAcct" href="/account" aria-current="page">Sign in</a>
+    <a class="btn btn-flag nav-cta" href="/trips"><span>Reserve</span></a>
+    <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><b>Menu</b></button>
+  </div>
+</header>
+
+<main>
+  <!-- signed out: sign in / create account / forgot / reset -->
+  <section class="acct" id="authView" hidden>
+    <div class="acct-photo" aria-hidden="true">
+      <img src="/img/clubhouse-dusk.jpg" alt="">
+      <p>Your trips,<br>in one place.<span>Reservations, receipts and course details.</span></p>
+    </div>
+    <div class="acct-main">
+      <div class="acct-box">
+        <div id="notice"></div>
+
+        <div id="paneTabs">
+          <h1 id="authTitle">Welcome back</h1>
+          <p class="sub" id="authSub">Sign in to see and manage your trips.</p>
+          <div class="tabs" role="tablist">
+            <button type="button" role="tab" id="tabIn" aria-selected="true" aria-controls="formIn">Sign in</button>
+            <button type="button" role="tab" id="tabUp" aria-selected="false" aria-controls="formUp">Create account</button>
+          </div>
+
+          <form id="formIn" role="tabpanel" aria-labelledby="tabIn" novalidate>
+            <label class="field">Email<input name="email" type="email" autocomplete="email" required></label>
+            <label class="field">Password<input name="password" type="password" autocomplete="current-password" required></label>
+            <p class="form-err" role="alert"></p>
+            <button class="btn btn-flag btn-wide" type="submit"><span>Sign in</span></button>
+            <p class="acct-alt"><button type="button" class="linkbtn" id="toForgot">Forgot your password?</button></p>
+          </form>
+
+          <form id="formUp" role="tabpanel" aria-labelledby="tabUp" novalidate hidden>
+            <label class="field">Full name<input name="name" autocomplete="name" required></label>
+            <label class="field">Email<input name="email" type="email" autocomplete="email" required></label>
+            <label class="field">Practice <small>(optional)</small><input name="practice" autocomplete="organization"></label>
+            <label class="field">Password <small>at least 10 characters</small><input name="password" type="password" autocomplete="new-password" minlength="10" required></label>
+            <p class="form-err" role="alert"></p>
+            <button class="btn btn-flag btn-wide" type="submit"><span>Create account</span></button>
+            <p class="acct-alt">We'll email you a link to confirm your address.</p>
+          </form>
+        </div>
+
+        <form id="formForgot" novalidate hidden>
+          <h1>Reset password</h1>
+          <p class="sub">Enter your email and we'll send you a link to choose a new password.</p>
+          <label class="field">Email<input name="email" type="email" autocomplete="email" required></label>
+          <p class="form-err" role="alert"></p>
+          <button class="btn btn-flag btn-wide" type="submit"><span>Send reset link</span></button>
+          <p class="acct-alt"><button type="button" class="linkbtn" data-back>Back to sign in</button></p>
+        </form>
+
+        <form id="formReset" novalidate hidden>
+          <h1>New password</h1>
+          <p class="sub">Choose a new password for your account.</p>
+          <label class="field">New password <small>at least 10 characters</small><input name="password" type="password" autocomplete="new-password" minlength="10" required></label>
+          <p class="form-err" role="alert"></p>
+          <button class="btn btn-flag btn-wide" type="submit"><span>Save password</span></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- signed in -->
+  <section class="member" id="memberView" hidden>
+    <div id="memberNotice"></div>
+    <div class="member-head">
+      <h1><span>Welcome back,</span><b id="hello"></b></h1>
+      <div class="member-actions">
+        <a class="btn btn-ink" id="adminLink" href="/admin" hidden><span>Admin</span></a>
+        <button class="btn btn-ink" id="signOut" type="button"><span>Sign out</span></button>
+      </div>
+    </div>
+    <div class="member-grid">
+      <div>
+        <h2>Your trips</h2>
+        <div id="resList"><p class="empty">Loading…</p></div>
+      </div>
+      <div>
+        <form class="panel" id="formProfile" novalidate>
+          <h2>Profile</h2>
+          <label class="field">Full name<input name="name" autocomplete="name" required></label>
+          <label class="field">Email <small id="emailState"></small><input name="email" type="email" disabled></label>
+          <label class="field">Practice<input name="practice" autocomplete="organization"></label>
+          <label class="field">Phone<input name="phone" type="tel" autocomplete="tel"></label>
+          <p class="form-err" role="alert"></p>
+          <button class="btn btn-flag" type="submit"><span>Save profile</span></button>
+        </form>
+        <form class="panel" id="formPassword" novalidate>
+          <h2>Password</h2>
+          <label class="field">Current password<input name="current" type="password" autocomplete="current-password" required></label>
+          <label class="field">New password <small>at least 10 characters</small><input name="password" type="password" autocomplete="new-password" minlength="10" required></label>
+          <p class="form-err" role="alert"></p>
+          <button class="btn btn-ink" type="submit"><span>Change password</span></button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
+  <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
+</footer>
+
+<script src="/app.js" defer></script>
+<script src="/account.js" defer></script>
+</body>
+</html>

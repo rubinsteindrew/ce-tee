@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{background:#0e1626}</style>
+<script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
+<title>The CE — CE &amp; Tees</title>
+<meta name="description" content="How the coursework works on a CE &amp; Tees trip, and the 2027 dental CE course catalog.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body data-page="ce" class="night">
+
+<header class="nav" id="nav">
+  <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/day">The day</a>
+    <a href="/ce" aria-current="page">The CE</a>
+    <a href="/trips">Trips</a>
+    <a href="/trips#faq">Questions</a>
+  </nav>
+  <div class="nav-right">
+    <a class="nav-acct" id="navAcct" href="/account">Sign in</a>
+    <a class="btn btn-flag nav-cta" href="/trips"><span>Reserve</span></a>
+    <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><b>Menu</b></button>
+  </div>
+</header>
+
+<main>
+  <section class="ce page-top" id="ce">
+    <div class="ce-head">
+      <p class="kicker light">The CE</p>
+      <h1 class="h2 light"><span class="mask"><span class="load-up" style="--i:0">Real coursework.</span></span><span class="mask script"><span class="load-up" style="--i:2">Not a slideshow at the bar.</span></span></h1>
+      <p class="ce-lede load" style="--i:3">Every trip is built around one continuing education course, taught live in the evenings by an instructor who is on the trip with you. The course and its credit hours are listed before you book.</p>
+    </div>
+
+    <ol class="ce-how">
+      <li class="rv"><b>01</b><h2>One course per trip</h2><p>Each trip has a single subject taught start to finish, so every evening builds on the one before.</p></li>
+      <li class="rv"><b>02</b><h2>Live, on site</h2><p>Classes meet in person at the club after dinner. No recordings and no webinars.</p></li>
+      <li class="rv"><b>03</b><h2>Small groups</h2><p>Spots on each trip are limited, so you can ask your question, and you will have played golf with the person answering it.</p></li>
+      <li class="rv"><b>04</b><h2>Certificate in hand</h2><p>Attend each session and you receive a certificate of completion with the course details and credit hours.</p></li>
+    </ol>
+
+    <div class="catalog-head">
+      <h2 class="h3 light">The 2027 course catalog</h2>
+      <p class="pencil light">drag, or scroll sideways →</p>
+    </div>
+    <div class="catalog" id="catalog" tabindex="0" aria-label="2027 courses"></div>
+    <p class="ce-fine">CE provider, approval status and credit type are listed on each course before you book. Check your state board's rules on live course hours.</p>
+  </section>
+
+  <section class="strip" aria-hidden="true">
+    <div class="strip-row" data-dir="-1">
+      <img src="/img/strip-1.jpg" alt="" loading="lazy"><img class="tall" src="/img/strip-5.jpg" alt="" loading="lazy"><img src="/img/strip-2.jpg" alt="" loading="lazy"><img class="wide" src="/img/strip-9.jpg" alt="" loading="lazy"><img src="/img/strip-6.jpg" alt="" loading="lazy"><img src="/img/strip-3.jpg" alt="" loading="lazy">
+    </div>
+    <div class="strip-row" data-dir="1">
+      <img src="/img/strip-8.jpg" alt="" loading="lazy"><img class="wide" src="/img/strip-11.jpg" alt="" loading="lazy"><img src="/img/strip-10.jpg" alt="" loading="lazy"><img src="/img/strip-4.jpg" alt="" loading="lazy"><img class="tall" src="/img/strip-12.jpg" alt="" loading="lazy"><img src="/img/strip-7.jpg" alt="" loading="lazy">
+    </div>
+  </section>
+
+  <section class="next-band dark">
+    <a class="next-link" href="/trips">
+      <span><span class="kicker light">Up next</span><b>The trips</b></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
+  <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
+</footer>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

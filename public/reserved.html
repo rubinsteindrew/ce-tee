@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{background:#14261d}</style>
+<title>You're on the tee sheet — CE &amp; Tees</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  body { background: var(--ink); color: var(--paper); }
+  .done { min-height: 100svh; display: grid; place-items: center; text-align: center; padding: 80px var(--gut); }
+  .done .kicker { justify-content: center; }
+  .done h1 { font: 800 clamp(4rem, 15vw, 13rem)/.8 var(--head); font-stretch: 62%; text-transform: uppercase; margin-bottom: 30px; }
+  .done p.msg { max-width: 34em; margin: 0 auto 14px; color: #c9cfc4; }
+  .done .demo { display: inline-block; margin-top: 12px; padding: 10px 16px; border: 1px dashed #5d6b5c; border-radius: 12px; font-size: 14px; color: var(--sun); }
+  .done .btn { margin-top: 34px; }
+</style>
+</head>
+<body>
+<main class="done">
+  <div>
+    <p class="kicker light" id="trip">Confirmed</p>
+    <h1><span class="mask"><span class="load-up" style="--i:0">You're on the</span></span><span class="mask"><span class="load-up" style="--i:1">tee sheet.</span></span></h1>
+    <p class="pencil light load" style="--i:3">see you out there</p>
+    <p class="msg load" style="--i:4">Your deposit is in and your spot is held. Watch your inbox for a receipt, then a welcome note with pairings, the course reading list and what to pack.</p>
+    <p class="demo" id="demo" hidden>Preview mode: no payment was taken. This is the page guests see after paying through Stripe.</p>
+    <div><a class="btn btn-flag" href="/account"><span>See my trips</span></a> <a class="btn btn-line" href="/"><span>Home</span></a></div>
+  </div>
+</main>
+<script>
+  const q = new URLSearchParams(location.search);
+  if (q.get('trip')) document.getElementById('trip').textContent = 'Confirmed · ' + q.get('trip');
+  document.getElementById('demo').hidden = !q.get('demo');
+</script>
+</body>
+</html>

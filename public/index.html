@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{background:#14261d}</style>
+<script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
+<title>CE &amp; Tees — Golf by day. Dental CE by night.</title>
+<meta name="description" content="CE &amp; Tees combines a golf trip with continuing education for dentists: tournament-style golf during the day, CE courses at night.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/img/hero-graybull.jpg">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body data-page="home">
+
+<header class="nav" id="nav">
+  <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/day">The day</a>
+    <a href="/ce">The CE</a>
+    <a href="/trips">Trips</a>
+    <a href="/trips#faq">Questions</a>
+  </nav>
+  <div class="nav-right">
+    <a class="nav-acct" id="navAcct" href="/account">Sign in</a>
+    <a class="btn btn-flag nav-cta" href="/trips"><span>Reserve</span></a>
+    <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><b>Menu</b></button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="hero-media" aria-hidden="true"><img src="/img/hero-graybull.jpg" alt=""></div>
+    <div class="hero-inner">
+      <p class="kicker hero-kicker load" style="--i:0"><span>Continuing education for dentists</span></p>
+      <h1 class="hero-title">
+        <span class="mask"><span class="load-up" style="--i:1">Golf by day.</span></span>
+        <span class="mask script"><span class="load-up" style="--i:3">CE by night.</span></span>
+      </h1>
+      <div class="hero-foot">
+        <p class="hero-lede load" style="--i:5">A golf trip and your continuing education in one. Play tournament-style rounds during the day, then earn CE credits in courses taught on site each evening.</p>
+        <div class="hero-actions load" style="--i:6">
+          <a class="btn btn-flag" href="#upcoming"><span>Upcoming classes</span></a>
+          <a class="btn btn-line" href="/day"><span>How a day runs</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="stamp hero-stamp load" style="--i:7" aria-hidden="true">
+      <svg viewBox="0 0 200 200">
+        <defs><path id="ring" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+        <g class="stamp-spin"><text><textPath href="#ring" textLength="478" lengthAdjust="spacing">TOURNAMENT GOLF ✦ CONTINUING EDUCATION ✦ DENTISTRY ✦ </textPath></text></g>
+        <g class="stamp-core"><line x1="100" y1="62" x2="100" y2="132"/><path d="M100 62 L132 74 L100 86 Z"/><ellipse cx="100" cy="134" rx="20" ry="5"/></g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="intro" id="intro">
+    <svg class="tracer" viewBox="0 0 1200 320" preserveAspectRatio="none" aria-hidden="true">
+      <path class="tracer-ghost" d="M 30 300 Q 620 -220 1150 262"/>
+      <path class="tracer-line" id="tracerLine" d="M 30 300 Q 620 -220 1150 262"/>
+    </svg>
+    <div class="tracer-ball" id="tracerBall" aria-hidden="true"></div>
+    <div class="tracer-pin" aria-hidden="true"><i></i></div>
+
+    <p class="kicker">What CE &amp; Tees is</p>
+    <p class="statement" id="statement">
+      Your license needs <em>CE hours.</em> <span class="pill" style="--img:url(/img/classroom.jpg)"></span>
+      Your golf game needs <em>a trip.</em> <span class="pill" style="--img:url(/img/round-one.jpg)"></span>
+      CE &amp; Tees puts both on the same itinerary.
+    </p>
+
+    <ol class="steps">
+      <li class="rv"><b>Day</b><h2>Tournament golf</h2><p>Breakfast, a morning round, lunch, then an afternoon round. Every round is played in a tournament-style format.</p></li>
+      <li class="rv"><b>Night</b><h2>CE courses</h2><p>After dinner, the group sits down for that trip's continuing education course, taught live on site.</p></li>
+      <li class="rv"><b>Home</b><h2>Credits earned</h2><p>Each trip lists its course and credit hours up front, so you know exactly what you are earning before you book.</p></li>
+    </ol>
+    <p class="steps-note">Dentistry for now, with more professions to follow.</p>
+  </section>
+
+  <section class="upcoming" id="upcoming">
+    <div class="up-head">
+      <div>
+        <p class="kicker">On the schedule</p>
+        <h2 class="h2">Upcoming <span class="script">classes.</span></h2>
+      </div>
+      <a class="btn btn-ink" href="/trips"><span>All trip details</span></a>
+    </div>
+    <div class="up-list" id="upList"><p class="empty">Loading the schedule…</p></div>
+    <div class="up-float" id="upFloat" aria-hidden="true"><img alt=""></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
+  <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
+</footer>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

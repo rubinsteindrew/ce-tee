@@ -1,0 +1,31 @@
+# Render blueprint: in Render choose New > Blueprint and pick this repo.
+services:
+  - type: web
+    name: ce-tee
+    runtime: node
+    plan: starter            # needed for the disk below (about $7/month)
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    autoDeploy: true         # every push to GitHub goes live
+    disk:
+      name: data
+      mountPath: /var/data   # accounts, trips and reservations live here and survive deploys
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_DOMAIN
+        value: ce-tee.com
+      - key: SITE_URL
+        value: https://ce-tee.com
+      - key: MAIL_FROM
+        value: CE & Tees <hello@ce-tee.com>
+      - key: RESEND_API_KEY
+        sync: false          # filled in on Render, never committed
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false

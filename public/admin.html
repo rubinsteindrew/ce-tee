@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<style>html{background:#f2ede1}</style>
+<title>Admin — CE &amp; Tees</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  body { font-size: 15px; min-height: 100vh; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 22px clamp(14px, 3vw, 40px) 80px; }
+  .top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 18px; border-bottom: 2px solid var(--ink); }
+  .top h1 { font: 800 clamp(2.4rem, 5vw, 3.6rem)/.85 var(--head); font-stretch: 62%; text-transform: uppercase; }
+  .top h1 span { color: var(--flag-dk); }
+  .top-right { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .who { color: var(--moss); font-size: 13.5px; }
+  .tag { font: 700 10.5px/1 var(--head); letter-spacing: .12em; text-transform: uppercase; padding: 7px 10px; border-radius: 999px; border: 1.5px solid currentColor; white-space: nowrap; display: inline-block; }
+  .tag.published { color: #2f6b3f; } .tag.draft { color: var(--moss); } .tag.soldout { color: var(--flag-dk); } .tag.archived { color: #6a6a6a; background: #e3dfd4; border-color: #e3dfd4; }
+  .btn { padding: 12px 18px; font-size: 12px; }
+  .btn-sm { padding: 8px 12px; font-size: 11px; border-color: var(--rule); color: var(--ink); background: #fff; }
+  .btn-sm::before { background: var(--ink); }
+  .btn-sm:hover { color: var(--paper); }
+  .btn-danger { color: var(--flag-dk); }
+  .tabs { margin: 22px 0 18px; max-width: 520px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .filters { display: flex; gap: 6px; }
+  .chip { border: 1.5px solid var(--rule); background: #fff; border-radius: 999px; padding: 8px 14px; cursor: pointer; font: 600 12px/1 var(--head); letter-spacing: .06em; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .scroll { overflow-x: auto; background: #fff; border-radius: 18px; box-shadow: 0 0 0 1px var(--rule); }
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th { font: 700 10.5px/1 var(--head); letter-spacing: .12em; text-transform: uppercase; color: var(--moss); text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  .tbl td { padding: 12px; border-bottom: 1px solid #ece6d7; vertical-align: middle; }
+  .tbl tr:last-child td { border-bottom: 0; }
+  .tbl td.n, .tbl th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .tbl .thumb { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; display: block; }
+  .tbl .name { font: 800 1.35rem/1 var(--head); font-stretch: 62%; text-transform: uppercase; }
+  .tbl .sub { color: var(--moss); font-size: 13px; }
+  .acts { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+  .empty { padding: 28px; color: var(--moss); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 22px; border: 0; }
+  .stat { background: #fff; border-radius: 16px; padding: 16px 18px; box-shadow: 0 0 0 1px var(--rule); border: 0 !important; }
+  .stat b { display: block; font: 800 2.6rem/.85 var(--head); font-stretch: 62%; }
+  .stat span { font-size: 13px; color: var(--moss); }
+  .gate { min-height: 100svh; display: grid; place-items: center; padding: 20px; text-align: center; }
+  .gate .box { max-width: 460px; }
+  .gate h1 { font: 800 3.4rem/.86 var(--head); font-stretch: 62%; text-transform: uppercase; margin: 18px 0 12px; }
+  .gate p { color: var(--moss); margin-bottom: 22px; }
+
+  .editor { width: min(820px, calc(100vw - 20px)); max-height: calc(100dvh - 20px); border: 0; border-radius: 22px; padding: 0; background: var(--paper); color: var(--ink); box-shadow: 0 40px 90px -20px #000; overflow-x: hidden; overflow-y: auto; }
+  .editor::backdrop { background: #0b150fcc; }
+  .editor form { padding: 26px clamp(16px, 3vw, 32px) 0; }
+  .editor h2 { font: 800 2.4rem/.9 var(--head); font-stretch: 62%; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px 14px; }
+  .c2 { grid-column: span 2; } .c3 { grid-column: span 3; } .c4 { grid-column: span 4; } .c6 { grid-column: span 6; }
+  .group { grid-column: span 6; font: italic 400 1.3rem/1 var(--serif); border-bottom: 1px solid var(--rule); padding: 18px 0 8px; }
+  .grid .field { margin: 0; }
+  .grid .field input, .grid .field select, .grid .field textarea { display: block; width: 100%; margin-top: 7px; padding: 11px 13px; background: #fff; color: var(--ink); border: 1.5px solid var(--rule); border-radius: 10px; font: 400 15px/1.35 var(--head); letter-spacing: 0; text-transform: none; }
+  .grid textarea { min-height: 84px; resize: vertical; }
+  .grid .field small { display: block; margin-top: 5px; }
+  .preview { width: 100%; aspect-ratio: 16 / 6; object-fit: cover; border-radius: 12px; background: var(--paper-2); }
+  .foot-acts { position: sticky; bottom: 0; display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 16px 0 20px; margin-top: 14px; background: linear-gradient(transparent, var(--paper) 30%); }
+  .foot-acts .form-err { margin: 0 auto 0 0; }
+  @media (max-width: 760px) { .c2, .c3, .c4 { grid-column: span 6; } .hide-s { display: none; } .stats { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<section class="gate" id="gate" hidden>
+  <div class="box">
+    <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+    <h1 id="gateTitle">Staff only</h1>
+    <p id="gateMsg"></p>
+    <a class="btn btn-flag" id="gateBtn" href="/account?next=/admin"><span>Sign in</span></a>
+  </div>
+</section>
+
+<div class="wrap" id="app" hidden>
+  <div class="top">
+    <div>
+      <a class="mark" href="/" style="font-size:22px;color:var(--ink)"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+      <h1>Admin <span>desk</span></h1>
+    </div>
+    <div class="top-right">
+      <span class="who" id="who"></span>
+      <span class="tag" id="payTag"></span>
+      <a class="btn btn-sm" href="/" target="_blank" rel="noopener"><span>View site</span></a>
+      <a class="btn btn-sm" href="/account"><span>My account</span></a>
+      <button class="btn btn-flag" id="add" type="button"><span>+ New trip</span></button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="trips" aria-selected="true">Trips</button>
+    <button type="button" role="tab" data-tab="res" aria-selected="false">Reservations</button>
+    <button type="button" role="tab" data-tab="members" aria-selected="false">Members</button>
+  </div>
+
+  <section data-panel="trips">
+    <div class="bar">
+      <div class="filters" id="tripFilter">
+        <button class="chip" data-f="active" aria-pressed="true">Active</button>
+        <button class="chip" data-f="archived" aria-pressed="false">Archived</button>
+        <button class="chip" data-f="all" aria-pressed="false">All</button>
+      </div>
+      <p class="who">Archived trips are hidden from the site but kept, with their reservations.</p>
+    </div>
+    <div class="scroll"><table class="tbl">
+      <thead><tr><th></th><th>Trip</th><th class="hide-s">Dates</th><th class="hide-s">Course</th><th class="n">CE</th><th class="n">Price</th><th class="n">Spots</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tripRows"></tbody>
+    </table></div>
+  </section>
+
+  <section data-panel="res" hidden>
+    <div class="scroll"><table class="tbl">
+      <thead><tr><th>When</th><th>Member</th><th>Trip</th><th class="n">Spots</th><th class="n">Deposit</th><th>Payment</th></tr></thead>
+      <tbody id="resRows"></tbody>
+    </table></div>
+  </section>
+
+  <section data-panel="members" hidden>
+    <div class="scroll"><table class="tbl">
+      <thead><tr><th>Name</th><th>Email</th><th class="hide-s">Practice</th><th class="hide-s">Joined</th><th class="n">Trips</th><th>Status</th></tr></thead>
+      <tbody id="memberRows"></tbody>
+    </table></div>
+  </section>
+</div>
+
+<dialog class="editor" id="editor" aria-labelledby="editorTitle">
+  <form id="tripForm" novalidate>
+    <h2 id="editorTitle">New trip</h2>
+    <div class="grid">
+      <div class="group">The trip</div>
+      <label class="field c3">Event name<input name="name" required placeholder="The Sandhills Session"></label>
+      <label class="field c3">Club<input name="club" placeholder="GrayBull Club"></label>
+      <label class="field c3">Location<input name="location" required placeholder="Maxwell, Nebraska"></label>
+      <label class="field c3">Status
+        <select name="status">
+          <option value="draft">Draft (hidden)</option>
+          <option value="published">Published (on the site)</option>
+          <option value="soldout">Sold out</option>
+          <option value="archived">Archived</option>
+        </select>
+      </label>
+      <label class="field c2">First day<input name="startDate" type="date" required></label>
+      <label class="field c2">Last day<input name="endDate" type="date" required></label>
+      <label class="field c2">Handwritten note<input name="tagline" placeholder="No cart paths. Just wind."></label>
+      <label class="field c6">Short description<textarea name="blurb" placeholder="One or two sentences about the club and the trip."></textarea></label>
+
+      <div class="group">The CE course</div>
+      <label class="field c4">Course title<input name="courseTitle" required placeholder="Implant Complications: Prevention and Rescue"></label>
+      <label class="field c2">CE credit hours<input name="credits" type="number" min="0" step="0.5" required></label>
+      <label class="field c2">Course code<input name="courseCode" placeholder="CE 301"></label>
+      <label class="field c4">Format<input name="courseFormat" placeholder="Lecture and hands-on"></label>
+      <label class="field c6">Instructor<input name="instructor" placeholder="Dr. Jane Doe, DDS"></label>
+      <label class="field c6">Course description<textarea name="courseSummary" placeholder="What the course covers."></textarea></label>
+      <label class="field c6">What you'll learn<textarea name="courseTopics" placeholder="One point per line"></textarea><small>One point per line. Shown as a checklist on the course card.</small></label>
+
+      <div class="group">The golf and the stay</div>
+      <label class="field c3">Course architect<input name="architect" placeholder="Coore &amp; Crenshaw"></label>
+      <label class="field c3">Course style<input name="style" placeholder="Inland links"></label>
+      <label class="field c2">Par<input name="par" type="number" min="0" step="1"></label>
+      <label class="field c2">Yards<input name="yards" type="number" min="0" step="1"></label>
+      <label class="field c6">Golf details<input name="golf" placeholder="Tournament-style golf every day…"></label>
+      <label class="field c6">Lodging<input name="lodging" placeholder="Lodging on property."></label>
+
+      <div class="group">Price and spots</div>
+      <label class="field c2">Price per person ($)<input name="price" type="number" min="0" step="1" required></label>
+      <label class="field c2">Deposit ($)<input name="deposit" type="number" min="0" step="1" required></label>
+      <label class="field c2">Total spots<input name="capacity" type="number" min="0" step="1" required></label>
+      <label class="field c2">Spots taken<input name="booked" type="number" min="0" step="1"><small>Goes up on its own when a deposit is paid.</small></label>
+
+      <div class="group">Photo</div>
+      <label class="field c3">From the photo library<select name="imagePick"></select></label>
+      <label class="field c3">…or an https:// image link<input name="image" placeholder="https://"></label>
+      <div class="c6"><img class="preview" id="preview" alt="Selected trip photo"></div>
+    </div>
+    <div class="foot-acts">
+      <p class="form-err" id="formError" role="alert"></p>
+      <button class="btn btn-sm" type="button" id="cancel"><span>Cancel</span></button>
+      <button class="btn btn-flag" type="submit" id="save"><span>Save trip</span></button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const money = (n) => '$' + Number(n || 0).toLocaleString('en-US');
+  const range = (a, b) => { const o = { month: 'short', day: 'numeric' }; const A = new Date(a + 'T12:00'), B = new Date(b + 'T12:00'); return A.toLocaleDateString('en-US', o) + ' – ' + B.toLocaleDateString('en-US', o) + ', ' + B.getFullYear(); };
+  const day = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  let state = { trips: [], reservations: [], users: [], images: [] }, editing = null, filter = 'active';
+
+  async function call(method, url, body) {
+    const r = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) { const e = new Error(data.error || 'Something went wrong.'); e.status = r.status; throw e; }
+    return data;
+  }
+
+  async function load() {
+    try { state = await call('GET', '/api/admin/overview'); }
+    catch (e) {
+      $('#gate').hidden = false; $('#app').hidden = true;
+      if (e.status === 403) {
+        $('#gateMsg').textContent = `${e.message} If you have one, sign in with it and confirm the email.`;
+        $('#gateBtn').href = '/account'; $('#gateBtn').firstElementChild.textContent = 'Go to my account';
+      } else $('#gateMsg').textContent = 'Sign in with your CE & Tees staff account to manage trips.';
+      return;
+    }
+    const me = await call('GET', '/api/auth/me');
+    $('#who').textContent = me.user.email;
+    $('#gate').hidden = true; $('#app').hidden = false;
+    render();
+  }
+
+  function render() {
+    $('#payTag').textContent = state.payments === 'live' ? 'Stripe connected' : 'Payments: preview mode';
+    $('#payTag').className = 'tag ' + (state.payments === 'live' ? 'published' : 'draft');
+    const today = new Date().toISOString().slice(0, 10);
+    const live = state.trips.filter((t) => t.status === 'published' || t.status === 'soldout');
+    const paid = state.reservations.filter((r) => !r.demo);
+    $('#stats').innerHTML = [
+      [live.filter((t) => t.endDate >= today).length, 'trips on the site'],
+      [state.reservations.reduce((n, r) => n + (r.spots || 0), 0), 'spots reserved'],
+      [money(paid.reduce((n, r) => n + (r.deposit || 0), 0)), 'deposits paid'],
+      [state.users.length, 'member accounts'],
+    ].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
+
+    const trips = [...state.trips].sort((a, b) => a.startDate.localeCompare(b.startDate))
+      .filter((t) => filter === 'all' || (filter === 'archived' ? t.status === 'archived' : t.status !== 'archived'));
+    const resCount = (id) => state.reservations.filter((r) => r.tripId === id).length;
+    $('#tripRows').innerHTML = trips.length ? trips.map((t) => `
+      <tr>
+        <td>${t.image ? `<img class="thumb" src="${esc(t.image)}" alt="">` : ''}</td>
+        <td><div class="name">${esc(t.name)}</div><div class="sub">${esc(t.club || '')}${t.club ? ' · ' : ''}${esc(t.location)}</div></td>
+        <td class="hide-s sub" style="white-space:nowrap">${esc(range(t.startDate, t.endDate))}</td>
+        <td class="hide-s sub">${esc(t.courseTitle)}</td>
+        <td class="n">${esc(t.credits)}</td>
+        <td class="n">${money(t.price)}<div class="sub">${money(t.deposit)} dep.</div></td>
+        <td class="n">${esc(t.booked || 0)}/${esc(t.capacity)}</td>
+        <td><span class="tag ${esc(t.status)}">${t.status === 'soldout' ? 'Sold out' : esc(t.status)}</span></td>
+        <td><div class="acts">
+          <button class="btn btn-sm" data-act="edit" data-id="${esc(t.id)}"><span>Edit</span></button>
+          <button class="btn btn-sm" data-act="copy" data-id="${esc(t.id)}"><span>Duplicate</span></button>
+          ${t.status === 'archived'
+            ? `<button class="btn btn-sm" data-act="restore" data-id="${esc(t.id)}"><span>Restore</span></button>${resCount(t.id) ? '' : `<button class="btn btn-sm btn-danger" data-act="del" data-id="${esc(t.id)}"><span>Delete</span></button>`}`
+            : `<button class="btn btn-sm" data-act="archive" data-id="${esc(t.id)}"><span>Archive</span></button>`}
+        </div></td>
+      </tr>`).join('') : `<tr><td colspan="9" class="empty">${filter === 'archived' ? 'Nothing archived.' : 'No trips yet. Add your first one.'}</td></tr>`;
+
+    const tripName = (id, fallback) => (state.trips.find((t) => t.id === id) || {}).name || fallback;
+    $('#resRows').innerHTML = state.reservations.length ? [...state.reservations].reverse().map((r) => `
+      <tr>
+        <td class="sub">${esc(day(r.createdAt))}</td>
+        <td>${esc(r.name)}<div class="sub">${esc(r.email)}</div></td>
+        <td>${esc(tripName(r.tripId, r.tripName))}</td>
+        <td class="n">${esc(r.spots)}</td>
+        <td class="n">${money(r.deposit)}</td>
+        <td>${r.demo ? '<span class="tag draft">Preview, unpaid</span>' : '<span class="tag published">Paid</span>'}</td>
+      </tr>`).join('') : '<tr><td colspan="6" class="empty">No reservations yet.</td></tr>';
+
+    $('#memberRows').innerHTML = state.users.length ? state.users.map((u) => `
+      <tr>
+        <td>${esc(u.name)}</td>
+        <td>${esc(u.email)}</td>
+        <td class="hide-s sub">${esc(u.practice)}</td>
+        <td class="hide-s sub">${esc(day(u.createdAt))}</td>
+        <td class="n">${state.reservations.filter((r) => r.userId === u.id || r.email === u.email).length}</td>
+        <td>${u.admin ? '<span class="tag soldout">Admin</span>' : u.verified ? '<span class="tag published">Confirmed</span>' : '<span class="tag draft">Unconfirmed</span>'}</td>
+      </tr>`).join('') : '<tr><td colspan="6" class="empty">No accounts yet.</td></tr>';
+  }
+
+  $$('.tabs [role=tab]').forEach((b) => b.addEventListener('click', () => {
+    $$('.tabs [role=tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    $$('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== b.dataset.tab; });
+  }));
+  $('#tripFilter').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-f]'); if (!b) return;
+    filter = b.dataset.f;
+    $$('#tripFilter .chip').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    render();
+  });
+
+  /* ---------- editor ---------- */
+  const editor = $('#editor'), form = $('#tripForm');
+  const FIELDS = ['name', 'club', 'location', 'status', 'startDate', 'endDate', 'tagline', 'blurb', 'courseTitle', 'credits', 'courseCode', 'courseFormat', 'instructor', 'courseSummary', 'courseTopics',
+    'architect', 'style', 'par', 'yards', 'golf', 'lodging', 'price', 'deposit', 'capacity', 'booked', 'image'];
+  function openEditor(trip, copy) {
+    editing = trip && !copy ? trip.id : null;
+    $('#editorTitle').textContent = editing ? 'Edit trip' : copy ? 'Duplicate trip' : 'New trip';
+    const base = trip ? { ...trip } : { status: 'draft', deposit: 500, booked: 0, image: state.images[0] || '',
+      golf: 'Tournament-style golf every day: a morning round, lunch at the clubhouse, then an afternoon round.' };
+    if (copy) { base.name += ' (copy)'; base.status = 'draft'; base.booked = 0; }
+    form.imagePick.innerHTML = '<option value="">Custom link</option>' + state.images.map((i) => `<option value="${esc(i)}">${esc(i.replace('/img/', ''))}</option>`).join('');
+    for (const f of FIELDS) form[f].value = base[f] ?? '';
+    form.imagePick.value = state.images.includes(base.image) ? base.image : '';
+    preview();
+    $('#formError').textContent = '';
+    editor.showModal();
+  }
+  const preview = () => { $('#preview').src = form.image.value || ''; };
+  form.imagePick.addEventListener('change', () => { if (form.imagePick.value) form.image.value = form.imagePick.value; preview(); });
+  form.image.addEventListener('input', () => { form.imagePick.value = state.images.includes(form.image.value) ? form.image.value : ''; preview(); });
+  $('#cancel').addEventListener('click', () => editor.close());
+  $('#add').addEventListener('click', () => openEditor(null));
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = {}; for (const f of FIELDS) body[f] = form[f].value;
+    if (!body.name || !body.startDate || !body.endDate || !body.courseTitle) { $('#formError').textContent = 'Fill in the event name, dates and course title.'; return; }
+    $('#save').disabled = true;
+    try {
+      await call(editing ? 'PUT' : 'POST', editing ? `/api/admin/trips/${editing}` : '/api/admin/trips', body);
+      editor.close(); await load();
+    } catch (ex) { $('#formError').textContent = ex.message; }
+    $('#save').disabled = false;
+  });
+
+  $('#tripRows').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const trip = state.trips.find((t) => t.id === b.dataset.id);
+    const act = b.dataset.act;
+    try {
+      if (act === 'edit') return openEditor(trip);
+      if (act === 'copy') return openEditor(trip, true);
+      if (act === 'archive' && confirm(`Archive "${trip.name}"? It will come off the website. You can restore it from the Archived list.`)) await call('PUT', `/api/admin/trips/${trip.id}`, { ...trip, status: 'archived' });
+      if (act === 'restore') await call('PUT', `/api/admin/trips/${trip.id}`, { ...trip, status: 'draft' });
+      if (act === 'del' && confirm(`Permanently delete "${trip.name}"? This cannot be undone.`)) await call('DELETE', `/api/admin/trips/${trip.id}`);
+      await load();
+    } catch (ex) { alert(ex.message); }
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>

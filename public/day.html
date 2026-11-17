@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{background:#14261d}</style>
+<script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
+<title>The day — CE &amp; Tees</title>
+<meta name="description" content="Breakfast, two tournament rounds, dinner with the faculty, then three hours of live dental CE. One day on a CE &amp; Tees trip.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body data-page="day">
+
+<header class="nav" id="nav">
+  <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/day" aria-current="page">The day</a>
+    <a href="/ce">The CE</a>
+    <a href="/trips">Trips</a>
+    <a href="/trips#faq">Questions</a>
+  </nav>
+  <div class="nav-right">
+    <a class="nav-acct" id="navAcct" href="/account">Sign in</a>
+    <a class="btn btn-flag nav-cta" href="/trips"><span>Reserve</span></a>
+    <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><b>Menu</b></button>
+  </div>
+</header>
+
+<main>
+  <section class="page-head">
+    <p class="kicker">The day</p>
+    <h1 class="h2"><span class="mask"><span class="load-up" style="--i:0">Breakfast</span></span><span class="mask"><span class="load-up" style="--i:1">to class.</span></span></h1>
+    <p class="lede load" style="--i:3">Golf while the sun is up, class once it goes down. Scroll to run the clock through a sample day; exact times are set for each trip.</p>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-row" data-dir="-1"><div>
+      <span>Breakfast</span><b>→</b><span class="o">Round one</span><b>→</b><span>Lunch</span><b>→</b><span class="o">Round two</span><b>→</b><span>Dinner</span><b>→</b><span class="o">Class</span><b>→</b>
+      <span>Breakfast</span><b>→</b><span class="o">Round one</span><b>→</b><span>Lunch</span><b>→</b><span class="o">Round two</span><b>→</b><span>Dinner</span><b>→</b><span class="o">Class</span><b>→</b>
+    </div></div>
+  </div>
+
+  <section class="day" id="day">
+    <div class="day-stick" id="dayStick">
+      <div class="day-stars" aria-hidden="true"></div>
+      <svg class="sky" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true"><path d="M 30 300 A 470 285 0 0 1 970 300" fill="none"/></svg>
+      <span class="orb orb-sun" aria-hidden="true"></span>
+      <span class="orb orb-moon" aria-hidden="true"></span>
+
+      <div class="day-top">
+        <p class="kicker">A sample day</p>
+        <ol class="rail" id="rail">
+          <li><button data-stop="0"><b>6:30</b>Breakfast</button></li>
+          <li><button data-stop="1"><b>7:30</b>Round one</button></li>
+          <li><button data-stop="2"><b>12:15</b>Lunch</button></li>
+          <li><button data-stop="3"><b>1:30</b>Round two</button></li>
+          <li><button data-stop="4"><b>6:30</b>Dinner</button></li>
+          <li><button data-stop="5"><b>8:00</b>Class</button></li>
+        </ol>
+      </div>
+
+      <div class="day-body">
+        <div class="day-text">
+          <div class="clock"><span id="clockTime">6:30</span><small id="clockAmpm">AM</small></div>
+          <div class="stops">
+            <article class="stop on"><h2>Breakfast</h2><p>Breakfast together at the clubhouse, with the day's pairings on the board.</p><span class="pencil">find your partner</span></article>
+            <article class="stop"><h2>Round one</h2><p>The first round of the day, played in a tournament-style format and scored for the trip leaderboard.</p><span class="pencil">first tee</span></article>
+            <article class="stop"><h2>Lunch</h2><p>Back to the clubhouse to eat, check the morning scores and get ready for the afternoon.</p><span class="pencil">scores posted</span></article>
+            <article class="stop"><h2>Round two</h2><p>More golf. The afternoon round, with new pairings and another chance to move up the leaderboard.</p><span class="pencil">best light of the day</span></article>
+            <article class="stop"><h2>Dinner</h2><p>Dinner as a group, with the course instructor at the table.</p><span class="pencil">then class</span></article>
+            <article class="stop"><h2>Class</h2><p>The evening CE course, taught live on site. Each session counts toward the credit hours listed for the trip.</p><span class="pencil">credits toward your license</span></article>
+          </div>
+        </div>
+        <div class="day-photos" id="dayPhotos">
+          <figure><img src="/img/breakfast.jpg" alt="Waffles piled with berries on a breakfast plate"></figure>
+          <figure><img src="/img/round-one.jpg" alt="A golfer finishing a tee shot over open links land in morning light" loading="lazy"></figure>
+          <figure><img src="/img/lunch.jpg" alt="A large pan of seafood paella at the clubhouse" loading="lazy"></figure>
+          <figure><img src="/img/round-two.jpg" alt="Four golfers walking up a fairway together" loading="lazy"></figure>
+          <figure><img src="/img/dinner.jpg" alt="A long dinner table covered in shared plates and glasses" loading="lazy"></figure>
+          <figure><img src="/img/classroom.jpg" alt="A timber-beamed clubhouse room with tables set up" loading="lazy"></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="next-band dark">
+    <a class="next-link" href="/ce">
+      <span><span class="kicker light">Up next</span><b>The CE</b></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
+  <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
+</footer>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{background:#14261d}</style>
+<script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
+<title>Trips — CE &amp; Tees</title>
+<meta name="description" content="The 2027 CE &amp; Tees schedule: private clubs, dates, courses, prices and what is included. Reserve your spot with a deposit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body data-page="trips">
+
+<header class="nav" id="nav">
+  <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/day">The day</a>
+    <a href="/ce">The CE</a>
+    <a href="/trips" aria-current="page">Trips</a>
+    <a href="/trips#faq">Questions</a>
+  </nav>
+  <div class="nav-right">
+    <a class="nav-acct" id="navAcct" href="/account">Sign in</a>
+    <a class="btn btn-flag nav-cta" href="#tripList"><span>Reserve</span></a>
+    <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><b>Menu</b></button>
+  </div>
+</header>
+
+<main>
+  <section class="trips page-top" id="trips">
+    <div class="trips-head">
+      <p class="kicker">The 2027 schedule</p>
+      <h1 class="h2"><span class="mask"><span class="load-up" style="--i:0">Pick your</span></span><span class="mask script"><span class="load-up" style="--i:2">week.</span></span></h1>
+      <p class="trips-sub load" style="--i:3">Each trip pairs tournament-style golf at a private club with one evening CE course. Every card lists the dates, course, credit hours and price. A deposit holds your spot.</p>
+    </div>
+    <div class="stack" id="tripList"><p class="empty">Loading the schedule…</p></div>
+  </section>
+
+  <section class="inc">
+    <div class="inc-photo clipin"><img src="/img/clubhouse-dusk.jpg" alt="A clubhouse in silhouette against a purple and orange sky after sunset" loading="lazy"></div>
+    <div class="inc-copy">
+      <p class="kicker">Every trip</p>
+      <h2 class="h2">What's <span class="script">included.</span></h2>
+      <ul class="inc-list">
+        <li class="rv"><b>Tournament golf</b><span>Morning and afternoon rounds, played in tournament-style formats.</span></li>
+        <li class="rv"><b>The CE course</b><span>Every evening session and your certificate of completion.</span></li>
+        <li class="rv"><b>Lodging</b><span>Stay at the club, close to the course and the classroom.</span></li>
+        <li class="rv"><b>Meals together</b><span>Breakfast, lunch and dinner with the group.</span></li>
+      </ul>
+      <p class="pencil inc-note">each trip card lists exactly what it covers</p>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="faq-head">
+      <p class="kicker">Questions</p>
+      <h2 class="h2">Asked on <span class="script">the range.</span></h2>
+    </div>
+    <div class="faq-list">
+      <details class="rv"><summary>Do I need to be a good golfer?</summary><p>No. Rounds are played in tournament-style formats with handicaps, so players of different levels can compete. If you can get around eighteen holes at a reasonable pace, you will fit right in.</p></details>
+      <details class="rv"><summary>How do the CE credits work?</summary><p>Each trip lists its course, instructor and credit hours. Attend the evening sessions and you receive a certificate of completion. Check your state board's rules on continuing education before you book.</p></details>
+      <details class="rv"><summary>What does the deposit do?</summary><p>It holds your spot on that trip and counts toward the trip price. We will be in touch about the balance after you reserve.</p></details>
+      <details class="rv"><summary>Can I reserve more than one spot?</summary><p>Yes. You can reserve up to four spots at once from your account.</p></details>
+      <details class="rv"><summary>Do I need an account?</summary><p>Yes. A free account keeps your reservations in one place and lets us send you trip details. You can create one when you reserve.</p></details>
+      <details class="rv"><summary>Is travel included?</summary><p>No. Travel to and from the club is up to you. Each trip card lists what is covered once you arrive.</p></details>
+    </div>
+  </section>
+
+  <section class="closer">
+    <img class="closer-bg" src="/img/firepit-stars.jpg" alt="" loading="lazy">
+    <div class="closer-inner">
+      <p class="pencil light">after class</p>
+      <h2 class="closer-title"><span class="mask"><span>See you on</span></span><span class="mask"><span>the first tee.</span></span></h2>
+      <a class="btn btn-flag" href="#tripList"><span>Reserve a spot</span></a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
+  <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
+</footer>
+
+<dialog class="reserve" id="reserve" aria-labelledby="reserveTitle">
+  <form method="dialog" class="reserve-close"><button aria-label="Close">Close ✕</button></form>
+  <p class="kicker" id="reserveLoc"></p>
+  <h2 id="reserveTitle" class="reserve-title"></h2>
+  <p class="reserve-meta" id="reserveMeta"></p>
+  <div class="reserve-gate" id="reserveGate" hidden>
+    <p>Reserving takes a free CE &amp; Tees account, so your trips and receipts stay in one place.</p>
+    <a class="btn btn-flag btn-wide" id="gateUp" href="/account?mode=signup"><span>Create an account</span></a>
+    <a class="btn btn-ink btn-wide" id="gateIn" href="/account"><span>Sign in</span></a>
+  </div>
+  <form id="reserveForm" novalidate>
+    <p class="reserve-who">Reserving as <b id="reserveWho"></b></p>
+    <label>Spots<select name="spots"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+    <div class="reserve-total"><span>Deposit due today</span><strong id="reserveTotal"></strong></div>
+    <p class="reserve-error" id="reserveError" role="alert"></p>
+    <button class="btn btn-flag btn-wide" type="submit" id="reserveSubmit"><span>Continue to secure payment</span></button>
+    <p class="reserve-fine" id="reserveFine"></p>
+  </form>
+</dialog>
+
+<script src="/app.js" defer></script>
+</body>
+</html>
