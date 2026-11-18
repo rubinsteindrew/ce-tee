@@ -377,7 +377,7 @@
             ${t.travel ? `<p class="ticket-travel"><b>Getting there</b>${esc(t.travel)}</p>` : ''}
           </details>` : ''}
           <div class="ticket-buy">
-            <div class="ticket-price"><b>${money(t.price)}</b><span>per person, all inclusive${t.deposit > 0 ? `<br>${money(t.deposit)} deposit` : ''}</span></div>
+            <div class="ticket-price"><b>${money(t.price)}</b><span>per person: stay, golf, food,<br>drinks and CE. Travel not included.${t.deposit > 0 ? `<br>${money(t.deposit)} deposit` : ''}</span></div>
             <div class="meter"><i data-w="${pct}"></i></div>
             <p class="meter-l"><span>${esc(t.booked)} of ${esc(t.capacity)} taken</span><span class="${few ? 'few' : ''}">${out ? 'Full' : few ? `Only ${t.spotsLeft} left` : `${t.spotsLeft} open`}</span></p>
             <button class="btn btn-flag btn-wide" data-reserve="${esc(t.id)}" ${out ? 'disabled' : ''}><span>${out ? 'Sold out' : t.deposit > 0 ? 'Reserve with deposit' : 'Reserve a spot'}</span></button>
