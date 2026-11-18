@@ -167,7 +167,9 @@
       <label class="field c2">Par<input name="par" type="number" min="0" step="1"></label>
       <label class="field c2">Yards<input name="yards" type="number" min="0" step="1"></label>
       <label class="field c6">Golf details<input name="golf" placeholder="Tournament-style golf every day…"></label>
-      <label class="field c6">Lodging<input name="lodging" placeholder="Lodging on property."></label>
+      <label class="field c6">Lodging<input name="lodging" placeholder="Accommodations at the club are included."></label>
+      <label class="field c6">Day by day<textarea name="itinerary" placeholder="Thursday, March 25: Welcome lunch, then golf until dark..."></textarea><small>One day per line, written as Day: what happens.</small></label>
+      <label class="field c6">Getting there<textarea name="travel" placeholder="About 30 minutes from the airport..."></textarea></label>
 
       <div class="group">Price and spots</div>
       <label class="field c2">Price per person ($)<input name="price" type="number" min="0" step="1" required></label>
@@ -292,7 +294,7 @@
   /* ---------- editor ---------- */
   const editor = $('#editor'), form = $('#tripForm');
   const FIELDS = ['name', 'club', 'location', 'status', 'startDate', 'endDate', 'tagline', 'blurb', 'courseTitle', 'credits', 'courseCode', 'courseFormat', 'instructor', 'courseSummary', 'courseTopics',
-    'architect', 'style', 'par', 'yards', 'golf', 'lodging', 'price', 'deposit', 'capacity', 'booked', 'image'];
+    'architect', 'style', 'par', 'yards', 'golf', 'lodging', 'itinerary', 'travel', 'price', 'deposit', 'capacity', 'booked', 'image'];
   function openEditor(trip, copy) {
     editing = trip && !copy ? trip.id : null;
     $('#editorTitle').textContent = editing ? 'Edit trip' : copy ? 'Duplicate trip' : 'New trip';

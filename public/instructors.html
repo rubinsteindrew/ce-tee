@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{background:#14261d}</style>
+<script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
+<title>Instructors — CE &amp; Tees</title>
+<meta name="description" content="Meet the dentists who teach the CE &amp; Tees continuing education courses.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body data-page="instructors">
+
+<header class="nav" id="nav">
+  <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/day">The day</a>
+    <a href="/ce">The CE</a>
+    <a href="/instructors" aria-current="page">Instructors</a>
+    <a href="/trips">Trips</a>
+    <a href="/trips#faq">Questions</a>
+  </nav>
+  <div class="nav-right">
+    <a class="nav-acct" id="navAcct" href="/account">Sign in</a>
+    <a class="btn btn-flag nav-cta" href="/trips"><span>Reserve</span></a>
+    <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><b>Menu</b></button>
+  </div>
+</header>
+
+<main>
+  <section class="page-head">
+    <p class="kicker">Instructors</p>
+    <h1 class="h2"><span class="mask"><span class="load-up" style="--i:0">Who's</span></span><span class="mask"><span class="load-up" style="--i:1">teaching.</span></span></h1>
+    <p class="lede load" style="--i:3">Every course is taught in person by a dentist who spends the trip with the group, on the course and at dinner, so you can keep asking questions long after class ends.</p>
+  </section>
+
+  <section class="inst-list" id="instList"><p class="empty">Loading instructors…</p></section>
+
+  <section class="next-band">
+    <a class="next-link" href="/trips">
+      <span><span class="kicker">See their courses</span><b>The trips</b></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
+  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/instructors">Instructors</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
+  <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
+</footer>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

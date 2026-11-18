@@ -61,7 +61,7 @@ const write = (name, value) => {
 // ---- trips -----------------------------------------------------------------
 const TRIP_FIELDS = {
   name: 'string', club: 'string', location: 'string', startDate: 'string', endDate: 'string', image: 'string',
-  tagline: 'string', blurb: 'string', architect: 'string', style: 'string', golf: 'string', lodging: 'string',
+  tagline: 'string', blurb: 'string', itinerary: 'string', travel: 'string', architect: 'string', style: 'string', golf: 'string', lodging: 'string',
   courseCode: 'string', courseTitle: 'string', courseFormat: 'string', courseSummary: 'string', courseTopics: 'string',
   instructor: 'string', status: 'string',
   par: 'number', yards: 'number', credits: 'number', rounds: 'number',

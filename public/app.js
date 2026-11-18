@@ -97,7 +97,7 @@
     const stick = $('#dayStick'), sun = $('.orb-sun'), moon = $('.orb-moon');
     const clockTime = $('#clockTime'), clockAmpm = $('#clockAmpm');
     const stops = $$('.stop'), rail = $$('#rail li'), photos = $$('#dayPhotos figure');
-    const TIMES = [390, 450, 735, 810, 1110, 1200, 1320];   // minutes after midnight for each stop, then lights out
+    const TIMES = [390, 450, 735, 810, 1110, 1140, 1320];   // minutes after midnight for each stop, then lights out
     const SUNRISE = 345, SUNSET = 1185, MOONRISE = 1110;
     const SKY = [[390, [242, 237, 225]], [900, [246, 233, 205]], [1075, [241, 196, 136]], [1130, [208, 124, 80]], [1172, [86, 50, 66]], [1215, [14, 22, 38]], [1320, [14, 22, 38]]];
     const skyAt = (t) => {
@@ -281,8 +281,9 @@
   }
 
   /* ---------- trips data (home list, course catalog, trip cards) ---------- */
-  const upList = $('#upList'), catalog = $('#catalog'), list = $('#tripList');
+  const upList = $('#upList'), catalog = $('#catalog'), list = $('#tripList'), instList = $('#instList');
   let trips = [], payments = 'demo';
+  const slugify = (s) => String(s || '').toLowerCase().replace(/^dr\.?\s+/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const initials = (n) => ((n || '').replace(/\b(Golf|Club|The)\b/g, '').match(/[A-Z]/g) || ['C']).slice(0, 2).join('');
 
   const upHtml = (t) => {
@@ -308,6 +309,33 @@
       ${t.courseTopics ? `<ul>${t.courseTopics.split(/\n+/).filter(Boolean).map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
       <p class="course-foot"><span>${esc(t.club || t.location)}<br>${esc(dates(t.startDate, t.endDate))}</span><a href="/trips#trip-${esc(t.id)}">See the trip →</a></p>
     </article>`;
+  // Instructors page: people come from /instructors.json, their courses from the trips they teach
+  function renderInstructors(upcoming) {
+    fetch('/instructors.json').then((r) => r.json()).then((people) => {
+      if (!people.length) { instList.innerHTML = '<p class="empty">Instructors for the next season will be posted here.</p>'; return; }
+      instList.innerHTML = people.map((p) => {
+        const teaching = upcoming.filter((t) => slugify(t.instructor) === slugify(p.name));
+        const ini = (p.name.replace(/^dr\.?\s+/i, '').match(/\b[A-Z]/g) || ['?']).slice(0, 2).join('');
+        return `
+        <article class="inst rv" id="${slugify(p.name)}">
+          <div class="inst-photo">${p.photo ? `<img src="${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : `<span aria-hidden="true">${esc(ini)}</span>`}</div>
+          <div class="inst-body">
+            ${p.specialties ? `<p class="kicker">${esc(p.specialties)}</p>` : ''}
+            <h2>${esc(p.name)}</h2>
+            ${p.title ? `<p class="inst-title">${esc(p.title)}</p>` : ''}
+            ${p.bio ? p.bio.split(/\n+/).filter(Boolean).map((para) => `<p class="inst-bio">${esc(para)}</p>`).join('') : '<p class="inst-bio inst-soon">Full bio coming soon.</p>'}
+            ${teaching.length ? `<div class="inst-teach"><h3>Teaching</h3><ul>${teaching.map((t) => `
+              <li><a href="/trips#trip-${esc(t.id)}"><b>${esc(t.courseTitle)}</b><span>${esc(t.club || t.name)} · ${esc(dates(t.startDate, t.endDate))} · ${esc(t.credits)} CE hours</span></a></li>`).join('')}</ul></div>` : ''}
+          </div>
+        </article>`;
+      }).join('');
+      watch(instList);
+      kick();
+      const target = location.hash && document.getElementById(location.hash.slice(1));
+      if (target) scrollTo({ top: target.getBoundingClientRect().top + scrollY - 100, behavior: 'instant' });
+    }).catch(() => { instList.innerHTML = '<p class="empty">The instructor list could not be loaded. Please refresh.</p>'; });
+  }
+
   const stamp = (t, i) => `
     <div class="stamp" aria-hidden="true"><svg viewBox="0 0 200 200">
       <defs><path id="ring-${i}" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
@@ -334,23 +362,32 @@
           <p class="ticket-event">${esc(t.name)}</p>
           <p class="ticket-dates">${esc(dates(t.startDate, t.endDate))}</p>
           <dl class="ticket-rows">
-            <div><dt>Course</dt><dd>${esc(t.courseTitle)}<small>${esc(t.instructor)}</small></dd></div>
+            <div><dt>Course</dt><dd>${esc(t.courseTitle)}<small>${t.instructor ? `<a href="/instructors#${slugify(t.instructor)}">${esc(t.instructor)}</a>` : ''}</small></dd></div>
             <div><dt>Credits</dt><dd>${esc(t.credits)} CE hours${t.courseFormat ? `<small>${esc(t.courseFormat)}</small>` : ''}</dd></div>
             ${t.golf ? `<div><dt>Golf</dt><dd>${esc(t.golf)}</dd></div>` : ''}
             ${t.lodging ? `<div><dt>Stay</dt><dd>${esc(t.lodging)}</dd></div>` : ''}
           </dl>
+          ${t.itinerary || t.travel ? `
+          <details class="ticket-days">
+            <summary>Day by day &amp; travel</summary>
+            ${t.itinerary ? `<ol>${t.itinerary.split(/\n+/).filter(Boolean).map((line) => {
+              const k = line.indexOf(':');
+              return k > 0 ? `<li><b>${esc(line.slice(0, k))}</b>${esc(line.slice(k + 1).trim())}</li>` : `<li>${esc(line)}</li>`;
+            }).join('')}</ol>` : ''}
+            ${t.travel ? `<p class="ticket-travel"><b>Getting there</b>${esc(t.travel)}</p>` : ''}
+          </details>` : ''}
           <div class="ticket-buy">
-            <div class="ticket-price"><b>${money(t.price)}</b><span>per person<br>${money(t.deposit)} deposit</span></div>
+            <div class="ticket-price"><b>${money(t.price)}</b><span>per person, all inclusive${t.deposit > 0 ? `<br>${money(t.deposit)} deposit` : ''}</span></div>
             <div class="meter"><i data-w="${pct}"></i></div>
             <p class="meter-l"><span>${esc(t.booked)} of ${esc(t.capacity)} taken</span><span class="${few ? 'few' : ''}">${out ? 'Full' : few ? `Only ${t.spotsLeft} left` : `${t.spotsLeft} open`}</span></p>
-            <button class="btn btn-flag btn-wide" data-reserve="${esc(t.id)}" ${out ? 'disabled' : ''}><span>${out ? 'Sold out' : 'Reserve with deposit'}</span></button>
+            <button class="btn btn-flag btn-wide" data-reserve="${esc(t.id)}" ${out ? 'disabled' : ''}><span>${out ? 'Sold out' : t.deposit > 0 ? 'Reserve with deposit' : 'Reserve a spot'}</span></button>
           </div>
         </div>
       </div>
     </article>`;
   };
 
-  if (upList || catalog || list) {
+  if (upList || catalog || list || instList) {
     const visibleTrips = (all) => all.filter((t) => t.status === 'published' || t.status === 'soldout').map((t) => {
       const spotsLeft = Math.max(0, (t.capacity || 0) - (t.booked || 0));
       return { ...t, spotsLeft, status: t.status === 'soldout' || spotsLeft === 0 ? 'soldout' : 'published' };
@@ -372,6 +409,7 @@
         cards.forEach((c) => io.observe(c.el));
         stampEls = $$('.stamp-spin');
       }
+      if (instList) renderInstructors(upcoming);
       kick();
       // arriving from a link like /trips#trip-xyz: jump there once the cards exist
       const target = location.hash && document.getElementById(location.hash.slice(1));
