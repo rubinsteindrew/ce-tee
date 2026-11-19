@@ -1,9 +1,45 @@
 [
   {
     "name": "Dr. Wahn Khang",
-    "title": "",
-    "photo": "",
-    "bio": "",
-    "specialties": "Implant dentistry"
+    "credentials": "DMD, MS",
+    "title": "Board-certified periodontist and implant surgeon · Founder, Perio Implant Center, Reston, Virginia",
+    "photo": "/img/wahn-khang.jpg",
+    "specialties": "Periodontics & implant surgery",
+    "bio": "Dr. Wahn Khang has spent three decades in clinical practice. As founder and director of the Perio Implant Center in Reston, Virginia, he focuses on advanced periodontal therapy, bone grafting and complex dental implant surgery.\nHe has taught more than 1,000 dental residents and practicing dentists. He is on the faculty of the Harvard School of Dental Medicine and Tufts University School of Dental Medicine, and is an associate professor at the University of Maryland School of Dentistry, where he was Chief Resident during his periodontology residency.\nDr. Khang lectures nationally and internationally and has published widely on periodontics and implantology.",
+    "cvFile": "/docs/wahn-khang-cv.docx",
+    "cv": [
+      {
+        "heading": "Appointments",
+        "items": [
+          "Associate Professor, University of Maryland School of Dentistry",
+          "Faculty, Harvard School of Dental Medicine",
+          "Faculty, Tufts University School of Dental Medicine",
+          "Diplomate, American Board of Periodontology & Implant Surgery"
+        ]
+      },
+      {
+        "heading": "Education & credentials",
+        "items": [
+          "Doctor of Dental Medicine (DMD), with honors, Tufts University School of Dental Medicine, 1996",
+          "Certificate in Periodontology, University of Maryland at Baltimore, 1998. Chief Resident; Outstanding Resident Award",
+          "Dental resident externship, Ottis Coast Guard Air Base",
+          "Anesthesiology fellowship, Baltimore Veterans Hospital"
+        ]
+      },
+      {
+        "heading": "Teaching & lectures",
+        "items": [
+          "Has trained more than 1,000 residents and practicing dentists worldwide",
+          "Course Director, AIC (Advanced Implant Course) Education Program: didactic training for general dentists on simple to complex implant surgery, plus live one-on-one surgical training",
+          "Invited lecturer, nationally and internationally, on dental implant surgery and advanced periodontics"
+        ]
+      },
+      {
+        "heading": "Publications & research",
+        "items": [
+          "Numerous scientific publications and research papers on contemporary dental implant techniques, bone augmentation and predictable approaches to periodontal therapy"
+        ]
+      }
+    ]
   }
 ]

@@ -33,6 +33,8 @@ const STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET');
 const SITE_URL = env('SITE_URL').replace(/\/$/, '');
 const SESSION_DAYS = 30;
+// Deposit per spot, in dollars. A trip can set its own; one left at 0 uses this.
+const DEFAULT_DEPOSIT = Number(env('DEFAULT_DEPOSIT')) || 1000;
 
 if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
   console.error('SESSION_SECRET is missing or too short. Set a long random value in .env or the environment.');
@@ -85,7 +87,7 @@ function cleanTrip(input, base = {}) {
 const visible = (t) => t.status === 'published' || t.status === 'soldout';
 const publicTrip = (t) => {
   const spotsLeft = Math.max(0, (t.capacity || 0) - (t.booked || 0));
-  return { ...t, spotsLeft, status: t.status === 'soldout' || spotsLeft === 0 ? 'soldout' : 'published' };
+  return { ...t, deposit: t.deposit > 0 ? t.deposit : DEFAULT_DEPOSIT, spotsLeft, status: t.status === 'soldout' || spotsLeft === 0 ? 'soldout' : 'published' };
 };
 
 // ---- accounts --------------------------------------------------------------
@@ -419,6 +421,7 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
   '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
+  '.pdf': 'application/pdf', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 function serveStatic(req, res, url) {
   let rel;

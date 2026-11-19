@@ -298,7 +298,7 @@
   function openEditor(trip, copy) {
     editing = trip && !copy ? trip.id : null;
     $('#editorTitle').textContent = editing ? 'Edit trip' : copy ? 'Duplicate trip' : 'New trip';
-    const base = trip ? { ...trip } : { status: 'draft', deposit: 500, booked: 0, image: state.images[0] || '',
+    const base = trip ? { ...trip } : { status: 'draft', deposit: 1000, booked: 0, image: state.images[0] || '',
       golf: 'Tournament-style golf every day: a morning round, lunch at the clubhouse, then an afternoon round.' };
     if (copy) { base.name += ' (copy)'; base.status = 'draft'; base.booked = 0; }
     form.imagePick.innerHTML = '<option value="">Custom link</option>' + state.images.map((i) => `<option value="${esc(i)}">${esc(i.replace('/img/', ''))}</option>`).join('');

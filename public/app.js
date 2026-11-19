@@ -321,9 +321,12 @@
           <div class="inst-photo">${p.photo ? `<img src="${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : `<span aria-hidden="true">${esc(ini)}</span>`}</div>
           <div class="inst-body">
             ${p.specialties ? `<p class="kicker">${esc(p.specialties)}</p>` : ''}
-            <h2>${esc(p.name)}</h2>
+            <h2>${esc(p.name)}${p.credentials ? `<small>${esc(p.credentials)}</small>` : ''}</h2>
             ${p.title ? `<p class="inst-title">${esc(p.title)}</p>` : ''}
             ${p.bio ? p.bio.split(/\n+/).filter(Boolean).map((para) => `<p class="inst-bio">${esc(para)}</p>`).join('') : '<p class="inst-bio inst-soon">Full bio coming soon.</p>'}
+            ${p.cv && p.cv.length ? `<details class="inst-cv"><summary>Curriculum vitae</summary>${p.cv.map((s) => `
+              <h3>${esc(s.heading)}</h3><ul>${(s.items || []).map((it) => `<li>${esc(it)}</li>`).join('')}</ul>`).join('')}
+              ${p.cvFile ? `<a class="inst-cv-file" href="${esc(p.cvFile)}" download>Download CV (Word)</a>` : ''}</details>` : ''}
             ${teaching.length ? `<div class="inst-teach"><h3>Teaching</h3><ul>${teaching.map((t) => `
               <li><a href="/trips#trip-${esc(t.id)}"><b>${esc(t.courseTitle)}</b><span>${esc(t.club || t.name)} · ${esc(dates(t.startDate, t.endDate))} · ${esc(t.credits)} CE hours</span></a></li>`).join('')}</ul></div>` : ''}
           </div>
