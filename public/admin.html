@@ -138,6 +138,7 @@
       <div class="group">The trip</div>
       <label class="field c3">Event name<input name="name" required placeholder="The Sandhills Session"></label>
       <label class="field c3">Club<input name="club" placeholder="GrayBull Club"></label>
+      <label class="field c3">Club logo<input name="logo" placeholder="/img/logos/graybull.png"><small>White logo file in /img/logos/. Leave empty to show the club's initials.</small></label>
       <label class="field c3">Location<input name="location" required placeholder="Maxwell, Nebraska"></label>
       <label class="field c3">Status
         <select name="status">
@@ -147,6 +148,7 @@
           <option value="archived">Archived</option>
         </select>
       </label>
+      <label class="field c2">Profession<select name="industry"></select><small>Which profession this trip is for.</small></label>
       <label class="field c2">First day<input name="startDate" type="date" required></label>
       <label class="field c2">Last day<input name="endDate" type="date" required></label>
       <label class="field c2">Handwritten note<input name="tagline" placeholder="No cart paths. Just wind."></label>
@@ -293,12 +295,16 @@
 
   /* ---------- editor ---------- */
   const editor = $('#editor'), form = $('#tripForm');
-  const FIELDS = ['name', 'club', 'location', 'status', 'startDate', 'endDate', 'tagline', 'blurb', 'courseTitle', 'credits', 'courseCode', 'courseFormat', 'instructor', 'courseSummary', 'courseTopics',
+  // professions come from /industries.json; add one there and it shows up here
+  let industries = [{ id: 'dentistry', name: 'Dentistry' }];
+  fetch('/industries.json').then((r) => r.json()).then((l) => { if (l.length) industries = l; }).catch(() => {});
+  const FIELDS = ['name', 'club', 'logo', 'location', 'status', 'industry', 'startDate', 'endDate', 'tagline', 'blurb', 'courseTitle', 'credits', 'courseCode', 'courseFormat', 'instructor', 'courseSummary', 'courseTopics',
     'architect', 'style', 'par', 'yards', 'golf', 'lodging', 'itinerary', 'travel', 'price', 'deposit', 'capacity', 'booked', 'image'];
   function openEditor(trip, copy) {
     editing = trip && !copy ? trip.id : null;
     $('#editorTitle').textContent = editing ? 'Edit trip' : copy ? 'Duplicate trip' : 'New trip';
-    const base = trip ? { ...trip } : { status: 'draft', deposit: 1000, booked: 0, image: state.images[0] || '',
+    form.industry.innerHTML = industries.map((i) => `<option value="${esc(i.id)}">${esc(i.name)}</option>`).join('');
+    const base = trip ? { industry: 'dentistry', ...trip } : { status: 'draft', industry: industries[0].id, deposit: 1000, booked: 0, image: state.images[0] || '',
       golf: 'Tournament-style golf every day: a morning round, lunch at the clubhouse, then an afternoon round.' };
     if (copy) { base.name += ' (copy)'; base.status = 'draft'; base.booked = 0; }
     form.imagePick.innerHTML = '<option value="">Custom link</option>' + state.images.map((i) => `<option value="${esc(i)}">${esc(i.replace('/img/', ''))}</option>`).join('');

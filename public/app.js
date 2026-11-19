@@ -150,6 +150,22 @@
   const hero = $('#hero'), intro = $('#intro');
   const tracer = $('.tracer'), tracerLine = $('#tracerLine'), tracerGlow = $('#tracerGlow'), tracerGhost = $('#tracerGhost'),
     tracerRoll = $('#tracerRoll'), tracerBall = $('#tracerBall'), tracerShadow = $('#tracerShadow');
+  // home: the light of one day, morning to dusk, keyed to how far down the page you are.
+  // Each stop stays light enough (luminance >= .80) for the secondary text colour to keep 4.5:1.
+  const skySun = $('#skySun');
+  const SKY = [[0, [244, 236, 219]], [0.35, [246, 246, 236]], [0.7, [251, 237, 207]], [1, [252, 228, 194]]];
+  const SUN = [[0, [255, 236, 200]], [0.4, [255, 250, 226]], [0.8, [255, 226, 176]], [1, [255, 204, 150]]];
+  const mixStops = (stops, p) => {
+    let i = 1; while (i < stops.length - 1 && p > stops[i][0]) i++;
+    const [p0, a] = stops[i - 1], [p1, b] = stops[i], k = clamp((p - p0) / (p1 - p0));
+    return a.map((v, j) => Math.round(v + (b[j] - v) * k));
+  };
+  // hero photo leans a little toward the pointer (eased, desktop pointers only)
+  const heroEl = $('#hero'), lean = { x: 0, y: 0, tx: 0, ty: 0 };
+  if (heroEl && !calm && matchMedia('(pointer: fine)').matches) {
+    heroEl.addEventListener('pointermove', (e) => { const r = heroEl.getBoundingClientRect(); lean.tx = (e.clientX - r.left) / r.width * 2 - 1; lean.ty = (e.clientY - r.top) / r.height * 2 - 1; });
+    heroEl.addEventListener('pointerleave', () => { lean.tx = lean.ty = 0; });
+  }
   const attrs = (el, a) => { for (const k in a) el.setAttribute(k, typeof a[k] === 'number' ? a[k].toFixed(1) : a[k]); };
   const marquees = $$('.marquee-row').map((row) => ({ el: row.firstElementChild, dir: +row.dataset.dir, half: 1 }));
   const strips = $$('.strip-row').map((el) => ({ el, dir: +el.dataset.dir }));
@@ -191,6 +207,11 @@
       Object.assign(geo, { yb, ground, H, gx0: gcx - grx + 4, gx1: gcx + grx - 4 });
       tracerLine.style.strokeDasharray = tracerGlow.style.strokeDasharray = `${geo.len} ${geo.len}`;
     }
+    if (skySun) {   // the day runs from the intro to the night-time closer
+      const top = (el) => el.getBoundingClientRect().top + scrollY;
+      const dusk = $('.dusk');   // the sun sets behind the dusk band, so the day ends where it begins
+      geo.dayA = top(intro); geo.dayB = dusk ? top(dusk) + dusk.offsetHeight * 0.3 : document.body.scrollHeight - innerHeight;
+    }
     if (day) {
       const stick = $('#dayStick'), sky = $('.sky');
       const sr = stick.getBoundingClientRect(), kr = sky.getBoundingClientRect();
@@ -216,8 +237,26 @@
     }
     if (stampEls.length) { const rot = (y * 0.11 + secs * 7).toFixed(2) + 'deg'; for (const s of stampEls) s.style.setProperty('--rot', rot); }
 
+    if (heroEl && Math.abs(lean.tx - lean.x) + Math.abs(lean.ty - lean.y) > 0.002) {
+      lean.x += (lean.tx - lean.x) * 0.07; lean.y += (lean.ty - lean.y) * 0.07;
+      heroEl.style.setProperty('--mx', lean.x.toFixed(3)); heroEl.style.setProperty('--my', lean.y.toFixed(3));
+    }
     if (y !== lastY || dirty) {
       lastY = y; dirty = false;
+      if (skySun) {
+        // p: 0 = morning at the intro, 1 = dusk as the night-time closer arrives
+        const p = clamp((y + vh * 0.55 - geo.dayA) / Math.max(1, geo.dayB - geo.dayA));
+        const [r, g, b] = mixStops(SKY, p), [sr, sg, sb] = mixStops(SUN, p);
+        const sky = `rgb(${r},${g},${b})`;
+        document.documentElement.style.background = sky;
+        document.documentElement.style.setProperty('--sky', sky);
+        skySun.style.setProperty('--sun-core', `rgb(${sr},${sg},${sb})`);
+        skySun.style.setProperty('--sun-glow', `rgba(255,${Math.round(214 - p * 40)},${Math.round(120 - p * 30)},${(0.34 - p * 0.12).toFixed(2)})`);
+        skySun.style.setProperty('--sun-haze', `rgba(255,${Math.round(214 - p * 40)},${Math.round(120 - p * 30)},0.12)`);
+        // the sun climbs from the lower left, peaks a little past midday, and sets at the lower right
+        const arc = Math.sin(Math.PI * Math.min(1, p * 1.04));
+        skySun.style.transform = `translate3d(${(vw * (0.04 + p * 0.92)).toFixed(1)}px,${(vh * (0.98 - arc * 0.82)).toFixed(1)}px,0)`;
+      }
       if (hero && y < vh * 1.2) hero.style.setProperty('--hp', calm ? '0' : clamp(y / (vh * 0.9)).toFixed(4));
 
       if (tracer) {
@@ -320,6 +359,56 @@
   const slugify = (s) => String(s || '').toLowerCase().replace(/^dr\.?\s+/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const initials = (n) => ((n || '').replace(/\b(Golf|Club|The)\b/g, '').match(/[A-Z]/g) || ['C']).slice(0, 2).join('');
 
+  /* ---------- professions (industries) ----------
+     /industries.json lists them; every trip and instructor has an `industry` id (older ones are dentistry).
+     ?for=<id> on the Trips and Instructors pages shows just that profession. */
+  const FOR = (new URLSearchParams(location.search).get('for') || '').toLowerCase();
+  const industryOf = (x) => x.industry || 'dentistry';
+  const industriesReady = fetch('/industries.json').then((r) => r.json()).catch(() => [{ id: 'dentistry', name: 'Dentistry', people: 'Dentists', status: 'open' }]);
+  const proGrid = $('#proGrid'), proFilter = $('#proFilter');
+  const nameOf = (inds, id) => (inds.find((i) => i.id === id) || { name: id.charAt(0).toUpperCase() + id.slice(1) }).name;
+
+  function renderFilter(inds) {
+    if (!proFilter) return;
+    const chip = (href, label, on) => `<a class="pro-chip" href="${href}"${on ? ' aria-current="true"' : ''}>${esc(label)}</a>`;
+    proFilter.innerHTML = `<span class="pro-filter-l">Profession</span>${chip(location.pathname, 'All', !FOR)}${inds.map((i) => chip(`${location.pathname}?for=${encodeURIComponent(i.id)}`, i.name, FOR === i.id)).join('')}<span class="pro-chip soon" aria-disabled="true">More coming soon</span>`;
+  }
+
+  function renderPros(inds, upcoming) {
+    if (!proGrid) return;
+    const md = (s) => { const [, m, d] = s.split('-').map(Number); return `${MONTHS[m - 1]} ${d}`; };
+    const cards = inds.map((ind) => {
+      const mine = upcoming.filter((t) => industryOf(t) === ind.id);
+      const hrs = mine.map((t) => +t.credits).filter((n) => n > 0);
+      const lo = Math.min(...hrs), hi = Math.max(...hrs);
+      const open = ind.status === 'open' && mine.length;
+      return `
+      <article class="pro rv">
+        <p class="pro-tag">${open ? 'Booking now' : 'Coming soon'}</p>
+        <h3>${esc(ind.name)}</h3>
+        ${ind.blurb ? `<p class="pro-blurb">${esc(ind.blurb)}</p>` : ''}
+        ${mine.length ? `<dl class="pro-stats">
+          <div><dt>${mine.length}</dt><dd>${mine.length === 1 ? 'trip' : 'trips'} scheduled</dd></div>
+          <div><dt>${esc(md(mine[0].startDate))}</dt><dd>next trip</dd></div>
+          ${hrs.length ? `<div><dt>${lo === hi ? lo : `${lo}–${hi}`}</dt><dd>CE hours per trip</dd></div>` : ''}
+        </dl>` : ''}
+        <div class="pro-links">
+          <a class="btn btn-sun" href="/trips?for=${encodeURIComponent(ind.id)}"><span>${esc(ind.people || ind.name)}: see trips</span></a>
+          <a class="pro-link" href="/instructors?for=${encodeURIComponent(ind.id)}">Meet the instructors →</a>
+        </div>
+      </article>`;
+    });
+    cards.push(`
+      <article class="pro soon rv">
+        <p class="pro-tag">Coming soon</p>
+        <h3>More professions</h3>
+        <p class="pro-blurb">Trips for other licensed professions are in the works. Each one will get its own courses and instructors, listed here as it opens.</p>
+      </article>`);
+    proGrid.classList.toggle('many', cards.length > 2);
+    proGrid.innerHTML = cards.join('');
+    watch(proGrid);
+  }
+
   const upHtml = (t) => {
     const out = t.status === 'soldout', few = !out && t.spotsLeft <= 5;
     const [, m1, d1] = t.startDate.split('-').map(Number), [, m2, d2] = t.endDate.split('-').map(Number);
@@ -329,7 +418,7 @@
       <span class="up-club"><b>${esc(t.club || t.name)}</b><small>${esc(t.location)}</small></span>
       <span class="up-course">${esc(t.courseTitle)}<small>${esc(t.instructor)}</small></span>
       <span class="up-ce"><b>${esc(t.credits)}</b>CE hrs</span>
-      <span class="up-spots ${out ? 'out' : few ? 'few' : ''}">${out ? 'Sold out' : few ? `${t.spotsLeft} left` : 'Open'}</span>
+      <span class="up-spots ${out ? 'out' : few ? 'few' : ''}">${out ? 'Sold out' : few ? `Only ${t.spotsLeft} left` : `${t.spotsLeft} spots left`}</span>
       <span class="up-go" aria-hidden="true">→</span>
     </a>`;
   };
@@ -345,8 +434,9 @@
     </article>`;
   // Instructors page: people come from /instructors.json, their courses from the trips they teach
   function renderInstructors(upcoming) {
-    fetch('/instructors.json').then((r) => r.json()).then((people) => {
-      if (!people.length) { instList.innerHTML = '<p class="empty">Instructors for the next season will be posted here.</p>'; return; }
+    Promise.all([fetch('/instructors.json').then((r) => r.json()), industriesReady]).then(([all, inds]) => {
+      const people = all.filter((p) => !FOR || industryOf(p) === FOR);
+      if (!people.length) { instList.innerHTML = `<p class="empty">${FOR ? 'Instructors for this profession will be posted here.' : 'Instructors for the next season will be posted here.'}</p>`; return; }
       instList.innerHTML = people.map((p) => {
         const teaching = upcoming.filter((t) => slugify(t.instructor) === slugify(p.name));
         const ini = (p.name.replace(/^dr\.?\s+/i, '').match(/\b[A-Z]/g) || ['?']).slice(0, 2).join('');
@@ -354,6 +444,7 @@
         <article class="inst rv" id="${slugify(p.name)}">
           <div class="inst-photo">${p.photo ? `<img src="${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : `<span aria-hidden="true">${esc(ini)}</span>`}</div>
           <div class="inst-body">
+            <a class="inst-ind" href="/instructors?for=${encodeURIComponent(industryOf(p))}">${esc(nameOf(inds, industryOf(p)))}</a>
             ${p.specialties ? `<p class="kicker">${esc(p.specialties)}</p>` : ''}
             <h2>${esc(p.name)}${p.credentials ? `<small>${esc(p.credentials)}</small>` : ''}</h2>
             ${p.title ? `<p class="inst-title">${esc(p.title)}</p>` : ''}
@@ -389,7 +480,7 @@
         <div class="tcard-photo">
           ${t.image ? `<img src="${esc(t.image)}" alt="The course at ${esc(t.club || t.location)}" loading="lazy">` : ''}
           <span class="tcard-no"><b>${String(i + 1).padStart(2, '0')}</b> / ${String(total).padStart(2, '0')}</span>
-          ${stamp(t, i)}
+          ${t.logo ? `<img class="tcard-logo" src="${esc(t.logo)}" alt="${esc(t.club || t.name)} logo">` : stamp(t, i)}
           <h2 class="tcard-club">${esc(t.club || t.name)}</h2>
           <p class="tcard-loc">${esc(t.location)}${t.tagline ? ` <span class="pencil">${esc(t.tagline)}</span>` : ''}</p>
           ${t.blurb ? `<p class="tcard-blurb">${esc(t.blurb)}</p>` : ''}
@@ -424,7 +515,7 @@
     </article>`;
   };
 
-  if (upList || catalog || list || instList) {
+  if (upList || catalog || list || instList || proGrid) {
     const visibleTrips = (all) => all.filter((t) => t.status === 'published' || t.status === 'soldout').map((t) => {
       const spotsLeft = Math.max(0, (t.capacity || 0) - (t.booked || 0));
       return { ...t, spotsLeft, status: t.status === 'soldout' || spotsLeft === 0 ? 'soldout' : 'published' };
@@ -440,9 +531,11 @@
         watch(upList);
       }
       if (catalog) catalog.innerHTML = upcoming.filter((t) => t.courseTitle).map(courseHtml).join('') || '<p class="ce-fine">Courses for the next season will be posted here.</p>';
+      industriesReady.then((inds) => { renderFilter(inds); renderPros(inds, upcoming); kick(); });
       if (list) {
-        list.innerHTML = upcoming.length ? upcoming.map((t, i) => tripHtml(t, i, upcoming.length)).join('') : '<p class="empty">New dates are being set. Check back soon.</p>';
-        cards = $$('.tcard', list).map((el) => ({ el, inner: $('.tcard-in', el), img: $('.tcard-photo img', el) || el }));
+        const shown = FOR ? upcoming.filter((t) => industryOf(t) === FOR) : upcoming;
+        list.innerHTML = shown.length ? shown.map((t, i) => tripHtml(t, i, shown.length)).join('') : `<p class="empty">${FOR ? 'No trips for this profession yet. Check back soon.' : 'New dates are being set. Check back soon.'}</p>`;
+        cards = $$('.tcard', list).map((el) => ({ el, inner: $('.tcard-in', el), img: $('.tcard-photo img:not(.tcard-logo)', el) || el }));
         cards.forEach((c) => io.observe(c.el));
         stampEls = $$('.stamp-spin');
       }

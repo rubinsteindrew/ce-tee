@@ -65,7 +65,7 @@ const TRIP_FIELDS = {
   name: 'string', club: 'string', location: 'string', startDate: 'string', endDate: 'string', image: 'string',
   tagline: 'string', blurb: 'string', itinerary: 'string', travel: 'string', architect: 'string', style: 'string', golf: 'string', lodging: 'string',
   courseCode: 'string', courseTitle: 'string', courseFormat: 'string', courseSummary: 'string', courseTopics: 'string',
-  instructor: 'string', status: 'string',
+  instructor: 'string', status: 'string', industry: 'string', logo: 'string',
   par: 'number', yards: 'number', credits: 'number', rounds: 'number',
   price: 'number', deposit: 'number', capacity: 'number', booked: 'number',
 };
@@ -78,10 +78,13 @@ function cleanTrip(input, base = {}) {
     else trip[key] = String(input[key]).slice(0, 3000).trim();
   }
   if (!STATUSES.includes(trip.status)) trip.status = 'draft';
+  // which profession the trip is for (an id from public/industries.json); older trips are dentistry
+  trip.industry = /^[a-z0-9-]{1,40}$/.test(trip.industry || '') ? trip.industry : 'dentistry';
   if (!trip.name) throw new Error('A trip needs an event name.');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trip.startDate || '') || !/^\d{4}-\d{2}-\d{2}$/.test(trip.endDate || '')) throw new Error('A trip needs a start and end date.');
   if (trip.endDate < trip.startDate) throw new Error('The last day is before the first day.');
   if (trip.image && !/^(\/img\/[\w.-]+|https:\/\/[^\s"'<>]+)$/.test(trip.image)) throw new Error('The photo must be from the library or an https:// link.');
+  if (trip.logo && !/^(\/img\/(logos\/)?[\w.-]+|https:\/\/[^\s"'<>]+)$/.test(trip.logo)) throw new Error('The club logo must be in /img/logos/ or an https:// link.');
   return trip;
 }
 const visible = (t) => t.status === 'published' || t.status === 'soldout';

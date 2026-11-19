@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>html{background:#14261d}</style>
 <script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
-<title>CE &amp; Tees — Golf by day. Dental CE by night.</title>
-<meta name="description" content="CE &amp; Tees combines a golf trip with continuing education for dentists: tournament-style golf during the day, CE courses at night.">
+<title>CE &amp; Tees — Golf by day. CE by night.</title>
+<meta name="description" content="CE &amp; Tees combines a golf trip with continuing education for licensed professionals: tournament-style golf during the day, CE courses at night. Dentistry is booking now.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
 <header class="nav" id="nav">
   <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
   <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/industries">Industries</a>
     <a href="/day">The day</a>
     <a href="/ce">The CE</a>
     <a href="/instructors">Instructors</a>
@@ -31,11 +32,13 @@
   </div>
 </header>
 
+<!-- The home page is one day: app.js tints the light and moves the sun across the sky as you scroll. -->
+<div class="home-sky" aria-hidden="true"><div class="sky-sun" id="skySun"></div></div>
 <main>
   <section class="hero" id="hero">
     <div class="hero-media" aria-hidden="true"><img src="/img/hero-graybull.jpg" alt=""></div>
     <div class="hero-inner">
-      <p class="kicker hero-kicker load" style="--i:0"><span>Continuing education for dentists</span></p>
+      <p class="kicker hero-kicker load" style="--i:0"><span>Continuing education for professionals who golf</span></p>
       <h1 class="hero-title">
         <span class="mask"><span class="load-up" style="--i:1">Golf by day.</span></span>
         <span class="mask script"><span class="load-up" style="--i:3">CE by night.</span></span>
@@ -47,13 +50,6 @@
           <a class="btn btn-line" href="/day"><span>How a day runs</span></a>
         </div>
       </div>
-    </div>
-    <div class="stamp hero-stamp load" style="--i:7" aria-hidden="true">
-      <svg viewBox="0 0 200 200">
-        <defs><path id="ring" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
-        <g class="stamp-spin"><text><textPath href="#ring" textLength="478" lengthAdjust="spacing">TOURNAMENT GOLF ✦ CONTINUING EDUCATION ✦ DENTISTRY ✦ </textPath></text></g>
-        <g class="stamp-core"><line x1="100" y1="62" x2="100" y2="132"/><path d="M100 62 L132 74 L100 86 Z"/><ellipse cx="100" cy="134" rx="20" ry="5"/></g>
-      </svg>
     </div>
   </section>
 
@@ -105,6 +101,17 @@
     <p class="steps-note">Dentistry for now, with more professions to follow.</p>
   </section>
 
+  <!-- One card per profession from /industries.json, filled in by app.js -->
+  <section class="pros" id="professions">
+    <div class="up-head">
+      <div>
+        <p class="kicker">Industries</p>
+        <h2 class="h2">Who it's <span class="script">for.</span></h2>
+      </div>
+    </div>
+    <div class="pro-grid" id="proGrid"></div>
+  </section>
+
   <section class="upcoming" id="upcoming">
     <div class="up-head">
       <div>
@@ -116,11 +123,21 @@
     <div class="up-list" id="upList"><p class="empty">Loading the schedule…</p></div>
     <div class="up-float" id="upFloat" aria-hidden="true"><img alt=""></div>
   </section>
+
+  <div class="dusk" aria-hidden="true"></div>
+
+  <section class="closer">
+    <img class="closer-bg" src="/img/firepit-stars.jpg" alt="" loading="lazy">
+    <div class="closer-inner">
+      <h2 class="closer-title"><span class="mask"><span>See you on</span></span><span class="mask"><span>the first tee.</span></span></h2>
+      <a class="btn btn-flag" href="/trips"><span>Reserve a spot</span></a>
+    </div>
+  </section>
 </main>
 
 <footer class="foot">
   <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
-  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/instructors">Instructors</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <nav class="foot-links" aria-label="Footer"><a href="/industries">Industries</a><a href="/day">The day</a><a href="/ce">The CE</a><a href="/instructors">Instructors</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
   <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
   <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
 </footer>

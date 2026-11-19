@@ -6,7 +6,7 @@
 <style>html{background:#14261d}</style>
 <script>try{if(/[?&]motion=calm/.test(location.search)||localStorage.getItem('ce-motion')==='calm')document.documentElement.classList.add('calm')}catch(e){}</script>
 <title>Instructors — CE &amp; Tees</title>
-<meta name="description" content="Meet the dentists who teach the CE &amp; Tees continuing education courses.">
+<meta name="description" content="Meet the instructors who teach the CE &amp; Tees continuing education courses, by industry.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
 <header class="nav" id="nav">
   <a class="mark" href="/" aria-label="CE &amp; Tees home"><span>CE</span><i>&amp;</i><span>TEES</span></a>
   <nav class="nav-links" id="navLinks" aria-label="Main">
+    <a href="/industries">Industries</a>
     <a href="/day">The day</a>
     <a href="/ce">The CE</a>
     <a href="/instructors" aria-current="page">Instructors</a>
@@ -34,9 +35,10 @@
   <section class="page-head">
     <p class="kicker">Instructors</p>
     <h1 class="h2"><span class="mask"><span class="load-up" style="--i:0">Who's</span></span><span class="mask"><span class="load-up" style="--i:1">teaching.</span></span></h1>
-    <p class="lede load" style="--i:3">Every course is taught in person by a dentist who spends the trip with the group, on the course and at dinner, so you can keep asking questions long after class ends.</p>
+    <p class="lede load" style="--i:3">Every course is taught in person by an instructor who spends the trip with the group, on the course and at dinner, so you can keep asking questions long after class ends.</p>
   </section>
 
+  <nav class="pro-filter pro-filter-pad" id="proFilter" aria-label="Filter by profession"></nav>
   <section class="inst-list" id="instList"><p class="empty">Loading instructors…</p></section>
 
   <section class="next-band">
@@ -49,7 +51,7 @@
 
 <footer class="foot">
   <a class="mark" href="/"><span>CE</span><i>&amp;</i><span>TEES</span></a>
-  <nav class="foot-links" aria-label="Footer"><a href="/day">The day</a><a href="/ce">The CE</a><a href="/instructors">Instructors</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
+  <nav class="foot-links" aria-label="Footer"><a href="/industries">Industries</a><a href="/day">The day</a><a href="/ce">The CE</a><a href="/instructors">Instructors</a><a href="/trips">Trips</a><a href="/trips#faq">Questions</a><a href="/account">Account</a></nav>
   <p>Golf trips with a syllabus. © <span id="year">2026</span></p>
   <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion: on</button>
 </footer>
