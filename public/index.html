@@ -58,17 +58,42 @@
   </section>
 
   <section class="intro" id="intro">
+    <!-- One golf shot: a tracer line follows the ball's flight, it lands on the green, hops once and rolls into the cup.
+         Every position is set in app.js (measure) so the shot fits the window. -->
     <svg class="tracer" viewBox="0 0 1200 320" preserveAspectRatio="none" aria-hidden="true">
-      <path class="tracer-ghost" d="M 30 300 Q 620 -220 1150 262"/>
-      <path class="tracer-line" id="tracerLine" d="M 30 300 Q 620 -220 1150 262"/>
+      <defs>
+        <radialGradient id="ballShade" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#f3f0e7"/><stop offset=".85" stop-color="#cfc9b8"/><stop offset="1" stop-color="#a59e8b"/></radialGradient>
+        <pattern id="ballDimples" width="2.6" height="2.6" patternUnits="userSpaceOnUse"><circle cx="1.3" cy="1.3" r=".5" fill="#857f6d" fill-opacity=".38"/></pattern>
+        <radialGradient id="greenShade" cx="50%" cy="38%" r="65%"><stop offset="0" stop-color="#8dbb68"/><stop offset=".7" stop-color="#679a49"/><stop offset="1" stop-color="#4c7b36"/></radialGradient>
+        <radialGradient id="cupShade" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#050a07"/><stop offset="1" stop-color="#1d2b21"/></radialGradient>
+        <linearGradient id="stickShade" x1="0" x2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset=".5" stop-color="#d9d4c6"/><stop offset="1" stop-color="#8f8a7c"/></linearGradient>
+        <filter id="tracerBlur" x="-5%" y="-30%" width="110%" height="160%"><feGaussianBlur stdDeviation="3"/></filter>
+      </defs>
+      <ellipse class="tracer-fringe" id="tracerTeeBox"/>
+      <path class="tracer-tee" id="tracerTee"/>
+      <ellipse class="tracer-fringe" id="tracerFringe"/>
+      <ellipse class="tracer-green" id="tracerGreen"/>
+      <ellipse class="tracer-cup" id="tracerCup"/>
+      <path class="tracer-ghost" id="tracerGhost"/>
+      <path class="tracer-glow" id="tracerGlow"/>
+      <path class="tracer-line" id="tracerLine"/>
+      <path class="tracer-roll" id="tracerRoll"/>
+      <ellipse class="tracer-shadow" id="tracerShadow"/>
+      <g class="tracer-pin" id="tracerPin">
+        <rect class="tracer-stick" id="tracerStick" width="2.6"/>
+        <path class="tracer-flag" id="tracerFlag"/>
+      </g>
+      <g class="tracer-ball" id="tracerBall">
+        <circle r="6.5" fill="url(#ballShade)"/>
+        <circle r="6.5" fill="url(#ballDimples)"/>
+        <circle r="6.5" fill="none" stroke="#14261d" stroke-opacity=".18" stroke-width=".6"/>
+      </g>
     </svg>
-    <div class="tracer-ball" id="tracerBall" aria-hidden="true"></div>
-    <div class="tracer-pin" aria-hidden="true"><i></i></div>
 
     <p class="kicker">What CE &amp; Tees is</p>
     <p class="statement" id="statement">
-      Your license needs <em>CE hours.</em> <span class="pill" style="--img:url(/img/classroom.jpg)"></span>
-      Your golf game needs <em>a trip.</em> <span class="pill" style="--img:url(/img/round-one.jpg)"></span>
+      Your license needs <em>CE hours.</em>
+      Your golf game needs <em>a trip.</em>
       CE &amp; Tees puts both on the same itinerary.
     </p>
 
