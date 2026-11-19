@@ -32,8 +32,6 @@
   </div>
 </header>
 
-<!-- The home page is one day: app.js tints the light and moves the sun across the sky as you scroll. -->
-<div class="home-sky" aria-hidden="true"><div class="sky-sun" id="skySun"></div></div>
 <main>
   <section class="hero" id="hero">
     <div class="hero-media" aria-hidden="true"><img src="/img/hero-graybull.jpg" alt=""></div>
@@ -54,38 +52,6 @@
   </section>
 
   <section class="intro" id="intro">
-    <!-- One golf shot: a tracer line follows the ball's flight, it lands on the green, hops once and rolls into the cup.
-         Every position is set in app.js (measure) so the shot fits the window. -->
-    <svg class="tracer" viewBox="0 0 1200 320" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <radialGradient id="ballShade" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#f3f0e7"/><stop offset=".85" stop-color="#cfc9b8"/><stop offset="1" stop-color="#a59e8b"/></radialGradient>
-        <pattern id="ballDimples" width="2.6" height="2.6" patternUnits="userSpaceOnUse"><circle cx="1.3" cy="1.3" r=".5" fill="#857f6d" fill-opacity=".38"/></pattern>
-        <radialGradient id="greenShade" cx="50%" cy="38%" r="65%"><stop offset="0" stop-color="#8dbb68"/><stop offset=".7" stop-color="#679a49"/><stop offset="1" stop-color="#4c7b36"/></radialGradient>
-        <radialGradient id="cupShade" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#050a07"/><stop offset="1" stop-color="#1d2b21"/></radialGradient>
-        <linearGradient id="stickShade" x1="0" x2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset=".5" stop-color="#d9d4c6"/><stop offset="1" stop-color="#8f8a7c"/></linearGradient>
-        <filter id="tracerBlur" x="-5%" y="-30%" width="110%" height="160%"><feGaussianBlur stdDeviation="3"/></filter>
-      </defs>
-      <ellipse class="tracer-fringe" id="tracerTeeBox"/>
-      <path class="tracer-tee" id="tracerTee"/>
-      <ellipse class="tracer-fringe" id="tracerFringe"/>
-      <ellipse class="tracer-green" id="tracerGreen"/>
-      <ellipse class="tracer-cup" id="tracerCup"/>
-      <path class="tracer-ghost" id="tracerGhost"/>
-      <path class="tracer-glow" id="tracerGlow"/>
-      <path class="tracer-line" id="tracerLine"/>
-      <path class="tracer-roll" id="tracerRoll"/>
-      <ellipse class="tracer-shadow" id="tracerShadow"/>
-      <g class="tracer-pin" id="tracerPin">
-        <rect class="tracer-stick" id="tracerStick" width="2.6"/>
-        <path class="tracer-flag" id="tracerFlag"/>
-      </g>
-      <g class="tracer-ball" id="tracerBall">
-        <circle r="6.5" fill="url(#ballShade)"/>
-        <circle r="6.5" fill="url(#ballDimples)"/>
-        <circle r="6.5" fill="none" stroke="#14261d" stroke-opacity=".18" stroke-width=".6"/>
-      </g>
-    </svg>
-
     <p class="kicker">What CE &amp; Tees is</p>
     <p class="statement" id="statement">
       Your license needs <em>CE hours.</em>
@@ -123,7 +89,14 @@
     <div class="up-list" id="upList"><p class="empty">Loading the schedule…</p></div>
   </section>
 
-  <div class="dusk" aria-hidden="true"></div>
+  <!-- The course at the end of the day: three ridges with mist drifting between them, then night (the closer). -->
+  <div class="horizon" aria-hidden="true">
+    <svg class="hill hill-back" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice"><path d="M0 150 C 210 108 400 100 620 128 C 840 156 1010 112 1200 98 C 1320 90 1400 104 1440 112 V 320 H 0 Z"/></svg>
+    <div class="mist mist-back"></div>
+    <svg class="hill hill-mid" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice"><path d="M0 204 C 170 172 360 160 560 182 C 760 204 900 178 1080 162 C 1240 148 1360 166 1440 178 V 320 H 0 Z"/></svg>
+    <div class="mist mist-front"></div>
+    <svg class="hill hill-front" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice"><path d="M0 262 C 200 232 380 222 560 236 C 720 248 840 240 960 224 C 1100 206 1290 220 1440 240 V 320 H 0 Z"/></svg>
+  </div>
 
   <section class="closer">
     <img class="closer-bg" src="/img/firepit-stars.jpg" alt="" loading="lazy">

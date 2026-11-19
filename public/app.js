@@ -148,18 +148,9 @@
 
   /* ---------- geometry ---------- */
   const hero = $('#hero'), intro = $('#intro');
-  const tracer = $('.tracer'), tracerLine = $('#tracerLine'), tracerGlow = $('#tracerGlow'), tracerGhost = $('#tracerGhost'),
-    tracerRoll = $('#tracerRoll'), tracerBall = $('#tracerBall'), tracerShadow = $('#tracerShadow');
-  // home: the light of one day, morning to dusk, keyed to how far down the page you are.
-  // Each stop stays light enough (luminance >= .80) for the secondary text colour to keep 4.5:1.
-  const skySun = $('#skySun');
-  const SKY = [[0, [244, 236, 219]], [0.35, [246, 246, 236]], [0.7, [251, 237, 207]], [1, [252, 228, 194]]];
-  const SUN = [[0, [255, 236, 200]], [0.4, [255, 250, 226]], [0.8, [255, 226, 176]], [1, [255, 204, 150]]];
-  const mixStops = (stops, p) => {
-    let i = 1; while (i < stops.length - 1 && p > stops[i][0]) i++;
-    const [p0, a] = stops[i - 1], [p1, b] = stops[i], k = clamp((p - p0) / (p1 - p0));
-    return a.map((v, j) => Math.round(v + (b[j] - v) * k));
-  };
+  // the faint contour map behind every page (styled and animated in CSS)
+  if (!$('.contours')) { const c = document.createElement('div'); c.className = 'contours'; c.setAttribute('aria-hidden', 'true'); document.body.prepend(c); }
+  const hills = $$('.horizon .hill');   // home: course ridges before the night-time closer
   // hero photo leans a little toward the pointer (eased, desktop pointers only)
   const heroEl = $('#hero'), lean = { x: 0, y: 0, tx: 0, ty: 0 };
   if (heroEl && !calm && matchMedia('(pointer: fine)').matches) {
@@ -176,42 +167,6 @@
   function measure() {
     geo = { vh: innerHeight, vw: innerWidth };
     marquees.forEach((m) => { m.half = m.el.scrollWidth / 2; });
-    if (tracer) {
-      // A real shot shape: climbs steeply, peaks past halfway, then falls more steeply than it rose.
-      // It lands on the green short of the pin, hops once and rolls into the cup.
-      // Tee on the left and green on the right share one ground line, set just above the "What CE & Tees is" heading.
-      const W = intro.clientWidth, H = tracer.clientHeight, R = 6.5, TEE = 5;
-      const tr = tracer.getBoundingClientRect(), kicker = $('.kicker', intro);
-      const ground = Math.min(0.82 * H + R, kicker.getBoundingClientRect().top - tr.top - 24);
-      const pad = parseFloat(getComputedStyle(intro).paddingLeft) || 0.03 * W;
-      const x0 = pad + 10, y0 = ground - TEE - R;     // the ball sitting on its tee
-      const xh = Math.min(0.955 * W, W - 36), xl = xh - Math.max(34, 0.075 * W), D = xl - x0;
-      const yb = ground - R;                          // ball centre when it sits on the green
-      const k = Math.max(20, yb - 6) / 0.737;         // apex lands just inside the top of the drawing area
-      const flight = `M ${x0.toFixed(1)} ${y0.toFixed(1)} C ${(x0 + 0.27 * D).toFixed(1)} ${(yb - 1.07 * k).toFixed(1)} ${(x0 + 0.83 * D).toFixed(1)} ${(yb - 0.93 * k).toFixed(1)} ${xl.toFixed(1)} ${yb.toFixed(1)}`;
-      attrs($('#tracerTeeBox'), { cx: x0 + 4, cy: ground + 1, rx: 26, ry: 5.5 });
-      attrs($('#tracerTee'), { d: `M ${(x0 - 4).toFixed(1)} ${(ground - TEE).toFixed(1)} h 8 l -2.6 2.4 v ${TEE + 2} l -1.4 2 l -1.4 -2 v ${-(TEE + 2)} z` });
-      const hop = xl + (xh - xl) * 0.42;
-      const roll = `M ${xl.toFixed(1)} ${yb.toFixed(1)} Q ${((xl + hop) / 2).toFixed(1)} ${(yb - Math.min(16, 0.09 * H)).toFixed(1)} ${hop.toFixed(1)} ${yb.toFixed(1)} L ${xh.toFixed(1)} ${yb.toFixed(1)}`;
-      tracer.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      for (const p of [tracerLine, tracerGlow, tracerGhost]) p.setAttribute('d', flight);
-      tracerRoll.setAttribute('d', roll);
-      const gcx = (xl + xh) / 2 + 4, grx = Math.min(W - gcx - 4, (xh - xl) / 2 + 30);
-      attrs($('#tracerFringe'), { cx: gcx, cy: ground + 1, rx: grx + 6, ry: 11 });
-      attrs($('#tracerGreen'), { cx: gcx, cy: ground, rx: grx, ry: 8.5 });
-      attrs($('#tracerCup'), { cx: xh, cy: ground, rx: 6.2, ry: 2.3 });
-      const pole = Math.max(52, Math.min(80, 0.36 * H));
-      attrs($('#tracerStick'), { x: xh - 1.3, y: ground - pole, height: pole });
-      attrs($('#tracerFlag'), { d: `M ${(xh + 1.3).toFixed(1)} ${(ground - pole).toFixed(1)} c 7 2 13 -1 22 4 c -8 4 -14 2 -22 9 z` });
-      geo.len = tracerLine.getTotalLength(); geo.roll = tracerRoll.getTotalLength();
-      Object.assign(geo, { yb, ground, H, gx0: gcx - grx + 4, gx1: gcx + grx - 4 });
-      tracerLine.style.strokeDasharray = tracerGlow.style.strokeDasharray = `${geo.len} ${geo.len}`;
-    }
-    if (skySun) {   // the day runs from the intro to the night-time closer
-      const top = (el) => el.getBoundingClientRect().top + scrollY;
-      const dusk = $('.dusk');   // the sun sets behind the dusk band, so the day ends where it begins
-      geo.dayA = top(intro); geo.dayB = dusk ? top(dusk) + dusk.offsetHeight * 0.3 : document.body.scrollHeight - innerHeight;
-    }
     if (day) {
       const stick = $('#dayStick'), sky = $('.sky');
       const sr = stick.getBoundingClientRect(), kr = sky.getBoundingClientRect();
@@ -243,39 +198,11 @@
     }
     if (y !== lastY || dirty) {
       lastY = y; dirty = false;
-      if (skySun) {
-        // p: 0 = morning at the intro, 1 = dusk as the night-time closer arrives
-        const p = clamp((y + vh * 0.55 - geo.dayA) / Math.max(1, geo.dayB - geo.dayA));
-        const [r, g, b] = mixStops(SKY, p), [sr, sg, sb] = mixStops(SUN, p);
-        const sky = `rgb(${r},${g},${b})`;
-        document.documentElement.style.background = sky;
-        document.documentElement.style.setProperty('--sky', sky);
-        skySun.style.setProperty('--sun-core', `rgb(${sr},${sg},${sb})`);
-        skySun.style.setProperty('--sun-glow', `rgba(255,${Math.round(214 - p * 40)},${Math.round(120 - p * 30)},${(0.34 - p * 0.12).toFixed(2)})`);
-        skySun.style.setProperty('--sun-haze', `rgba(255,${Math.round(214 - p * 40)},${Math.round(120 - p * 30)},0.12)`);
-        // the sun climbs from the lower left, peaks a little past midday, and sets at the lower right
-        const arc = Math.sin(Math.PI * Math.min(1, p * 1.04));
-        skySun.style.transform = `translate3d(${(vw * (0.04 + p * 0.92)).toFixed(1)}px,${(vh * (0.98 - arc * 0.82)).toFixed(1)}px,0)`;
-      }
-      if (hero && y < vh * 1.2) hero.style.setProperty('--hp', calm ? '0' : clamp(y / (vh * 0.9)).toFixed(4));
-
-      if (tracer) {
-        const ir = intro.getBoundingClientRect();
-        if (ir.bottom > -100 && ir.top < vh + 100) {
-          const tp = clamp((vh * 0.92 - ir.top) / (vh * 0.95));
-          // 0 to 0.78 of the scroll is the flight, then the hop and roll; the last sliver drops it in the cup
-          const fly = clamp(tp / 0.78), rolled = clamp((tp - 0.78) / 0.2);
-          tracerLine.style.strokeDashoffset = tracerGlow.style.strokeDashoffset = (geo.len * (1 - fly)).toFixed(1);
-          const pt = fly < 1 ? tracerLine.getPointAtLength(geo.len * fly) : tracerRoll.getPointAtLength(geo.roll * rolled);
-          const sunk = clamp((tp - 0.975) / 0.025);
-          const bx = pt.x, by = pt.y + sunk * 7;
-          tracerBall.setAttribute('transform', `translate(${bx.toFixed(1)} ${by.toFixed(1)}) scale(${(1 - sunk * 0.45).toFixed(3)})`);
-          tracerBall.style.opacity = (1 - sunk).toFixed(2);
-          // the shadow stays on the ground under the ball: smaller and fainter the higher it flies
-          const lift = clamp((geo.yb - pt.y) / (geo.H * 1.2));
-          attrs(tracerShadow, { cx: bx + 1.5, cy: geo.ground + 1, rx: 6.5 * (1 - lift * 0.5), ry: 2 * (1 - lift * 0.5) });
-          const overGreen = bx > geo.gx0 && bx < geo.gx1;
-          tracerShadow.style.opacity = overGreen ? (0.34 * (1 - lift * 0.8) * (1 - sunk)).toFixed(2) : '0';
+      if (hills.length) {   // the course layers settle into place as the horizon scrolls up into view
+        const r = hills[0].parentNode.getBoundingClientRect();
+        if (r.bottom > -50 && r.top < vh + 50) {
+          const p = calm ? 1 : clamp((vh - r.top) / (vh * 0.9));
+          hills.forEach((h, i) => { h.style.transform = `translate3d(0,${((1 - p) * [46, 26, 10][i]).toFixed(1)}px,0)`; });
         }
       }
       if (statement) {
