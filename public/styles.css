@@ -209,6 +209,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .day-text { display: flex; flex-direction: column; min-width: 0; }
 .clock { display: flex; align-items: baseline; gap: 12px; font: 800 clamp(5rem, min(17vw, 27vh), 16rem)/.78 var(--head); font-stretch: 62%; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .clock small { font: 700 clamp(.9rem, 1.5vw, 1.25rem)/1 var(--head); font-stretch: 100%; letter-spacing: .14em; color: var(--hot); }
+.clock .clock-est { font: 500 12px/1 var(--label); letter-spacing: .06em; text-transform: uppercase; color: var(--sub, var(--moss)); margin-left: -4px; }
 .stops { display: grid; margin-top: clamp(12px, 2.4vh, 26px); }
 .stop { grid-area: 1 / 1; opacity: 0; transform: translateY(26px); transition: opacity .45s, transform .6s var(--ease); pointer-events: none; }
 .stop.on { opacity: 1; transform: none; pointer-events: auto; }
