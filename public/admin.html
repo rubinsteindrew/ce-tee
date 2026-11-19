@@ -8,7 +8,7 @@
 <title>Admin — CE &amp; Tees</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Libre+Caslon+Text:ital@0;1&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 <style>
   body { font-size: 15px; min-height: 100vh; }
@@ -62,6 +62,9 @@
   .grid textarea { min-height: 84px; resize: vertical; }
   .grid .field small { display: block; margin-top: 5px; }
   .preview { width: 100%; aspect-ratio: 16 / 6; object-fit: cover; border-radius: 12px; background: var(--paper-2); }
+  .logo-prev { padding: 18px 22px; border-radius: 12px; background: var(--ink); }
+  .logo-prev img { max-height: 54px; max-width: 280px; width: auto; }
+  .uploading { opacity: .5; pointer-events: none; }
   .foot-acts { position: sticky; bottom: 0; display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 16px 0 20px; margin-top: 14px; background: linear-gradient(transparent, var(--paper) 30%); }
   .foot-acts .form-err { margin: 0 auto 0 0; }
   @media (max-width: 760px) { .c2, .c3, .c4 { grid-column: span 6; } .hide-s { display: none; } .stats { grid-template-columns: 1fr 1fr; } }
@@ -138,7 +141,10 @@
       <div class="group">The trip</div>
       <label class="field c3">Event name<input name="name" required placeholder="The Sandhills Session"></label>
       <label class="field c3">Club<input name="club" placeholder="GrayBull Club"></label>
-      <label class="field c3">Club logo<input name="logo" placeholder="/img/logos/graybull.png"><small>White logo file in /img/logos/. Leave empty to show the club's initials.</small></label>
+      <label class="field c3">Club logo<select name="logoPick"></select><small>Shown in the photo's top corner. Use white artwork. "None" shows the club's initials.</small></label>
+      <label class="field c3">…or upload a logo<input name="logoFile" type="file" accept="image/png,image/webp,image/jpeg"><small>PNG with a transparent background works best.</small></label>
+      <input type="hidden" name="logo">
+      <div class="c6 logo-prev" id="logoPrevWrap" hidden><img id="logoPreview" alt="Selected club logo"></div>
       <label class="field c3">Location<input name="location" required placeholder="Maxwell, Nebraska"></label>
       <label class="field c3">Status
         <select name="status">
@@ -159,7 +165,8 @@
       <label class="field c2">CE credit hours<input name="credits" type="number" min="0" step="0.5" required></label>
       <label class="field c2">Course code<input name="courseCode" placeholder="CE 301"></label>
       <label class="field c4">Format<input name="courseFormat" placeholder="Lecture and hands-on"></label>
-      <label class="field c6">Instructor<input name="instructor" placeholder="Dr. Jane Doe, DDS"></label>
+      <label class="field c6">Instructor<input name="instructor" list="instructorList" placeholder="Dr. Jane Doe, DDS"><small>Pick a listed instructor to link the trip to their profile, or type a new name.</small></label>
+      <datalist id="instructorList"></datalist>
       <label class="field c6">Course description<textarea name="courseSummary" placeholder="What the course covers."></textarea></label>
       <label class="field c6">What you'll learn<textarea name="courseTopics" placeholder="One point per line"></textarea><small>One point per line. Shown as a checklist on the course card.</small></label>
 
@@ -181,7 +188,8 @@
 
       <div class="group">Photo</div>
       <label class="field c3">From the photo library<select name="imagePick"></select></label>
-      <label class="field c3">…or an https:// image link<input name="image" placeholder="https://"></label>
+      <label class="field c3">…or upload a photo<input name="photoFile" type="file" accept="image/jpeg,image/png,image/webp"><small>A wide course photo, ideally 2000px across. Up to 8 MB.</small></label>
+      <label class="field c6">…or an https:// image link<input name="image" placeholder="https://"></label>
       <div class="c6"><img class="preview" id="preview" alt="Selected trip photo"></div>
     </div>
     <div class="foot-acts">
@@ -307,14 +315,51 @@
     const base = trip ? { industry: 'dentistry', ...trip } : { status: 'draft', industry: industries[0].id, deposit: 1000, booked: 0, image: state.images[0] || '',
       golf: 'Tournament-style golf every day: a morning round, lunch at the clubhouse, then an afternoon round.' };
     if (copy) { base.name += ' (copy)'; base.status = 'draft'; base.booked = 0; }
-    form.imagePick.innerHTML = '<option value="">Custom link</option>' + state.images.map((i) => `<option value="${esc(i)}">${esc(i.replace('/img/', ''))}</option>`).join('');
+    const label = (u) => u.replace(/^\/(img\/(logos\/)?|uploads\/)/, '').replace(/^(photo|logo)-[a-z0-9]+-/, 'uploaded-');
+    form.imagePick.innerHTML = '<option value="">Custom link</option>' + state.images.map((i) => `<option value="${esc(i)}">${esc(label(i))}</option>`).join('');
+    const logos = [...(state.logos || [])]; if (base.logo && !logos.includes(base.logo)) logos.push(base.logo);
+    form.logoPick.innerHTML = '<option value="">None (show initials)</option>' + logos.map((l) => `<option value="${esc(l)}">${esc(label(l))}</option>`).join('');
     for (const f of FIELDS) form[f].value = base[f] ?? '';
     form.imagePick.value = state.images.includes(base.image) ? base.image : '';
+    form.logoPick.value = base.logo || '';
+    form.photoFile.value = ''; form.logoFile.value = '';
     preview();
     $('#formError').textContent = '';
     editor.showModal();
   }
-  const preview = () => { $('#preview').src = form.image.value || ''; };
+  const preview = () => {
+    $('#preview').src = form.image.value || '';
+    $('#logoPrevWrap').hidden = !form.logo.value; $('#logoPreview').src = form.logo.value || '';
+  };
+  form.logoPick.addEventListener('change', () => { form.logo.value = form.logoPick.value; preview(); });
+  // instructors on the site, offered as suggestions in the Instructor field
+  fetch('/instructors.json').then((r) => r.json()).then((list) => {
+    $('#instructorList').innerHTML = list.map((p) => `<option value="${esc(p.name)}">`).join('');
+  }).catch(() => {});
+  // uploads: send the file, then select it in the form
+  async function upload(input, kind) {
+    const file = input.files[0]; if (!file) return null;
+    $('#formError').textContent = '';
+    if (file.size > 8_000_000) { $('#formError').textContent = 'That file is too big. Keep it under 8 MB.'; input.value = ''; return null; }
+    input.closest('.field').classList.add('uploading');
+    try {
+      const r = await fetch(`/api/admin/upload?kind=${kind}`, { method: 'POST', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'Upload failed.');
+      return d.url;
+    } catch (ex) { $('#formError').textContent = ex.message; input.value = ''; return null; }
+    finally { input.closest('.field').classList.remove('uploading'); }
+  }
+  form.photoFile.addEventListener('change', async () => {
+    const u = await upload(form.photoFile, 'photo'); if (!u) return;
+    state.images.push(u); form.imagePick.insertAdjacentHTML('beforeend', `<option value="${esc(u)}">uploaded photo</option>`);
+    form.image.value = u; form.imagePick.value = u; preview();
+  });
+  form.logoFile.addEventListener('change', async () => {
+    const u = await upload(form.logoFile, 'logo'); if (!u) return;
+    (state.logos = state.logos || []).push(u); form.logoPick.insertAdjacentHTML('beforeend', `<option value="${esc(u)}">uploaded logo</option>`);
+    form.logo.value = u; form.logoPick.value = u; preview();
+  });
   form.imagePick.addEventListener('change', () => { if (form.imagePick.value) form.image.value = form.imagePick.value; preview(); });
   form.image.addEventListener('input', () => { form.imagePick.value = state.images.includes(form.image.value) ? form.image.value : ''; preview(); });
   $('#cancel').addEventListener('click', () => editor.close());

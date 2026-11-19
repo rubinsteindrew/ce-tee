@@ -334,22 +334,32 @@
       if (!e.isIntersecting) continue;
       e.target.classList.add('in');
       io.unobserve(e.target);
-      const n = e.target.matches('[data-count]') ? e.target : $('[data-count]', e.target);
-      if (n) countUp(n);
+      // scoreboard numbers: plain counts and ranges ("2", "6–8") tick up when they come into view
+      const nums = [...(e.target.matches(SCORE) ? [e.target] : []), ...$$(SCORE, e.target)];
+      nums.forEach(countUp);
       const bar = $('.meter i', e.target);
       if (bar) bar.style.width = bar.dataset.w + '%';
     }
   }, { threshold: 0.15 });
+  const SCORE = '.pro-stats dt, .up-ce b, .stat-n';
+  // section headings rise into place from behind a mask (the hero and page titles have their own load-in)
+  // (the mask goes on an inner wrapper: a fully clipped element never registers as on screen)
+  $$('.h2').forEach((h) => {
+    if (h.querySelector('.load-up')) return;
+    const inner = document.createElement('span'); inner.className = 'rv-head-in';
+    inner.append(...h.childNodes); h.append(inner); h.classList.add('rv', 'rv-head');
+  });
   const watch = (root = document) => $$('.rv, .clipin, .closer', root).forEach((el) => io.observe(el));
   watch();
   function countUp(el) {
-    const to = +el.dataset.count;
-    if (calm || !to) return;
-    const start = performance.now();
+    const text = el.textContent.trim(), m = text.match(/^(\d+)(?:\s*([–-])\s*(\d+))?$/);
+    if (calm || !m || el.dataset.counted) return;
+    el.dataset.counted = '1';
+    const a = +m[1], b = m[3] ? +m[3] : null, start = performance.now();
     (function step(now) {
-      const k = clamp((now - start) / 1100);
-      el.textContent = Math.round(to * (1 - Math.pow(1 - k, 4)));
-      if (k < 1) requestAnimationFrame(step);
+      const k = 1 - Math.pow(1 - clamp((now - start) / 1100), 4);
+      el.textContent = b === null ? String(Math.round(a * k)) : `${Math.round(a * k)}–${Math.round(b * k)}`;
+      if (k < 1) requestAnimationFrame(step); else el.textContent = text;
     })(start);
   }
 
@@ -470,7 +480,7 @@
       <g class="stamp-spin"><text><textPath href="#ring-${i}" textLength="478" lengthAdjust="spacing">${esc(`${t.club || t.name} ✦ ${t.location} ✦ `.toUpperCase())}</textPath></text></g>
       <text class="stamp-init" x="100" y="122">${esc(initials(t.club || t.name))}</text>
     </svg></div>`;
-  const tripHtml = (t, i, total) => {
+  const tripHtml = (t, i, total, inds = []) => {
     const out = t.status === 'soldout', few = !out && t.spotsLeft <= 5;
     const pct = t.capacity ? Math.round((t.booked / t.capacity) * 100) : 0;
     const facts = [['Design', t.architect], ['Par', t.par || ''], ['Yards', t.yards ? Number(t.yards).toLocaleString('en-US') : ''], ['Style', t.style]].filter((f) => f[1]);
@@ -487,6 +497,7 @@
           ${facts.length ? `<dl class="holecard">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
         </div>
         <div class="ticket">
+          <a class="ticket-ind" href="/trips?for=${encodeURIComponent(industryOf(t))}">${esc(nameOf(inds, industryOf(t)))}</a>
           <p class="ticket-event">${esc(t.name)}</p>
           <p class="ticket-dates">${esc(dates(t.startDate, t.endDate))}</p>
           <dl class="ticket-rows">
@@ -532,18 +543,19 @@
       }
       if (catalog) catalog.innerHTML = upcoming.filter((t) => t.courseTitle).map(courseHtml).join('') || '<p class="ce-fine">Courses for the next season will be posted here.</p>';
       industriesReady.then((inds) => { renderFilter(inds); renderPros(inds, upcoming); kick(); });
-      if (list) {
+      if (list) industriesReady.then((inds) => {   // cards wait for the industry names their tags show
         const shown = FOR ? upcoming.filter((t) => industryOf(t) === FOR) : upcoming;
-        list.innerHTML = shown.length ? shown.map((t, i) => tripHtml(t, i, shown.length)).join('') : `<p class="empty">${FOR ? 'No trips for this profession yet. Check back soon.' : 'New dates are being set. Check back soon.'}</p>`;
+        list.innerHTML = shown.length ? shown.map((t, i) => tripHtml(t, i, shown.length, inds)).join('') : `<p class="empty">${FOR ? 'No trips for this profession yet. Check back soon.' : 'New dates are being set. Check back soon.'}</p>`;
         cards = $$('.tcard', list).map((el) => ({ el, inner: $('.tcard-in', el), img: $('.tcard-photo img:not(.tcard-logo)', el) || el }));
         cards.forEach((c) => io.observe(c.el));
         stampEls = $$('.stamp-spin');
-      }
+        kick();
+        // arriving from a link like /trips#trip-xyz: jump there once the cards exist
+        const target = location.hash && document.getElementById(location.hash.slice(1));
+        if (target && target.classList.contains('tcard')) { measure(); scrollTo({ top: target.getBoundingClientRect().top + scrollY - 90, behavior: 'instant' }); }
+      });
       if (instList) renderInstructors(upcoming);
       kick();
-      // arriving from a link like /trips#trip-xyz: jump there once the cards exist
-      const target = location.hash && document.getElementById(location.hash.slice(1));
-      if (target && target.classList.contains('tcard')) { measure(); scrollTo({ top: target.getBoundingClientRect().top + scrollY - 90, behavior: 'instant' }); }
     }).catch(() => {
       const msg = '<p class="empty">The schedule could not be loaded. Please refresh.</p>';
       if (upList) upList.innerHTML = msg;

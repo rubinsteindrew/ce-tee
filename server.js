@@ -49,6 +49,14 @@ const FILES = {
   reservations: path.join(DATA, 'reservations.json'),
   tokens: path.join(DATA, 'tokens.json'),
 };
+// photos and logos uploaded from the admin desk live beside the data (on Render, the persistent disk),
+// so a redeploy of the code never wipes them. Served at /uploads/<file>.
+const UPLOADS = path.join(DATA, 'uploads');
+fs.mkdirSync(UPLOADS, { recursive: true });
+const IMG_PATH = String.raw`\/img\/(?:logos\/)?[\w.-]+|\/uploads\/[\w.-]+|https:\/\/[^\s"'<>]+`;
+const imageType = (b) => (b[0] === 0x89 && b.toString('latin1', 1, 4) === 'PNG' ? 'png'
+  : b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff ? 'jpg'
+  : b.toString('latin1', 0, 4) === 'RIFF' && b.toString('latin1', 8, 12) === 'WEBP' ? 'webp' : '');
 // first run on a fresh disk: start from the sample trips that ship with the code
 if (!fs.existsSync(FILES.trips) && fs.existsSync(path.join(ROOT, 'data', 'trips.sample.json'))) {
   fs.copyFileSync(path.join(ROOT, 'data', 'trips.sample.json'), FILES.trips);
@@ -83,8 +91,8 @@ function cleanTrip(input, base = {}) {
   if (!trip.name) throw new Error('A trip needs an event name.');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trip.startDate || '') || !/^\d{4}-\d{2}-\d{2}$/.test(trip.endDate || '')) throw new Error('A trip needs a start and end date.');
   if (trip.endDate < trip.startDate) throw new Error('The last day is before the first day.');
-  if (trip.image && !/^(\/img\/[\w.-]+|https:\/\/[^\s"'<>]+)$/.test(trip.image)) throw new Error('The photo must be from the library or an https:// link.');
-  if (trip.logo && !/^(\/img\/(logos\/)?[\w.-]+|https:\/\/[^\s"'<>]+)$/.test(trip.logo)) throw new Error('The club logo must be in /img/logos/ or an https:// link.');
+  if (trip.image && !new RegExp(`^(${IMG_PATH})$`).test(trip.image)) throw new Error('The photo must be from the library, an upload or an https:// link.');
+  if (trip.logo && !new RegExp(`^(${IMG_PATH})$`).test(trip.logo)) throw new Error('The club logo must be from the logo list, an upload or an https:// link.');
   return trip;
 }
 const visible = (t) => t.status === 'published' || t.status === 'soldout';
@@ -380,9 +388,22 @@ async function api(req, res, url) {
     if (!isAdmin(me)) return send(res, 403, { error: `Admin pages are for verified @${ADMIN_DOMAIN} accounts.` });
 
     if (route === 'GET /api/admin/overview') {
-      const images = fs.readdirSync(path.join(PUBLIC, 'img')).filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).map((f) => `/img/${f}`);
+      const pics = (dir, url) => (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).map((f) => `${url}/${f}`);
+      const uploaded = pics(UPLOADS, '/uploads');
+      const images = [...pics(path.join(PUBLIC, 'img'), '/img'), ...uploaded.filter((u) => u.includes('/photo-'))];
+      const logos = [...pics(path.join(PUBLIC, 'img', 'logos'), '/img/logos'), ...uploaded.filter((u) => u.includes('/logo-'))];
       const users = read('users').map(publicUser).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-      return send(res, 200, { trips: read('trips'), reservations: read('reservations'), users, images, adminDomain: ADMIN_DOMAIN, payments: STRIPE_SECRET_KEY ? 'live' : 'demo' });
+      return send(res, 200, { trips: read('trips'), reservations: read('reservations'), users, images, logos, adminDomain: ADMIN_DOMAIN, payments: STRIPE_SECRET_KEY ? 'live' : 'demo' });
+    }
+    // upload a course photo or club logo: the raw file is the request body, ?kind=photo|logo
+    if (route === 'POST /api/admin/upload') {
+      const kind = url.searchParams.get('kind') === 'logo' ? 'logo' : 'photo';
+      let buf; try { buf = await readBody(req, 8_000_000); } catch { return send(res, 413, { error: 'That file is too big. Keep it under 8 MB.' }); }
+      const ext = imageType(buf);
+      if (!ext) return send(res, 400, { error: 'Upload a JPG, PNG or WebP image.' });
+      const name = `${kind}-${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}.${ext}`;
+      fs.writeFileSync(path.join(UPLOADS, name), buf);
+      return send(res, 201, { url: `/uploads/${name}` });
     }
     if (route === 'POST /api/admin/trips') {
       const b = await jsonBody(req);
@@ -461,6 +482,13 @@ http.createServer(async (req, res) => {
   try {
     if (url.pathname === '/healthz') { res.writeHead(200); return res.end('ok'); }
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
+    if (url.pathname.startsWith('/uploads/')) {   // admin uploads, from the data folder
+      const name = url.pathname.slice('/uploads/'.length);
+      const file = path.join(UPLOADS, name);
+      if (!/^[\w.-]+\.(png|jpg|webp)$/.test(name) || !fs.existsSync(file)) { res.writeHead(404); return res.end('Not found'); }
+      res.writeHead(200, { 'Content-Type': TYPES['.' + name.split('.').pop()], 'Cache-Control': 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
+      return fs.createReadStream(file).pipe(res);
+    }
     if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('Method not allowed'); }
     return serveStatic(req, res, url);
   } catch (err) {
