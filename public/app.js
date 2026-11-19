@@ -1,4 +1,4 @@
-/* CE & Tees — shared behaviour for every public page.
+/* CE & Tee — shared behaviour for every public page.
    Each block only runs if its section is on the page.
    Scroll-linked motion is a pure function of scroll position, so it rewinds
    exactly when you scroll back. The footer "Motion" switch turns it down. */
@@ -99,7 +99,7 @@
     const stops = $$('.stop'), rail = $$('#rail li'), photos = $$('#dayPhotos figure');
     const TIMES = [390, 450, 735, 810, 1110, 1140, 1320];   // minutes after midnight for each stop, then lights out
     const SUNRISE = 345, SUNSET = 1185, MOONRISE = 1110;
-    const SKY = [[390, [242, 237, 225]], [900, [246, 233, 205]], [1075, [241, 196, 136]], [1130, [208, 124, 80]], [1172, [86, 50, 66]], [1215, [14, 22, 38]], [1320, [14, 22, 38]]];
+    const SKY = [[390, [250, 250, 250]], [900, [244, 244, 244]], [1075, [222, 222, 222]], [1130, [150, 150, 150]], [1172, [52, 60, 76]], [1215, [14, 22, 38]], [1320, [14, 22, 38]]];
     const skyAt = (t) => {
       let i = 0; while (i < SKY.length - 2 && t > SKY[i + 1][0]) i++;
       const [t0, a] = SKY[i], [t1, b] = SKY[i + 1], k = clamp((t - t0) / (t1 - t0));
@@ -115,9 +115,9 @@
       st.setProperty('--bg', skyAt(t));
       if (last.dark !== dark) {
         last.dark = dark; nightNow = dark;
-        st.setProperty('--fg', dark ? '#f2ede1' : '#14261d');
-        st.setProperty('--sub', dark ? '#c3cad9' : '#4c5a4c');
-        st.setProperty('--hot', dark ? '#f2bd45' : '#a8321c');
+        st.setProperty('--fg', dark ? '#fafafa' : '#0b1f3a');
+        st.setProperty('--sub', dark ? '#cacaca' : '#5a5a5a');
+        st.setProperty('--hot', dark ? '#ffffff' : '#a8321c');
       }
       const arc = (fr) => [geo.cx - geo.rx * Math.cos(Math.PI * fr), geo.baseY - geo.ry * Math.sin(Math.PI * fr)];
       const [sx, sy] = arc((t - SUNRISE) / (SUNSET - SUNRISE)), [mx, my] = arc((t - MOONRISE) / 720);

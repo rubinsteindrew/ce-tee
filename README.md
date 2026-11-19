@@ -1,4 +1,4 @@
-# CE & Tees
+# CE & Tee
 
 Golf trips with dental continuing education: tournament-style golf by day, CE courses at night.
 One small Node server with no packages to install.

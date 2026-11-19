@@ -1,4 +1,4 @@
-// CE & Tees — site server. No dependencies: run with `node server.js`.
+// CE & Tee — site server. No dependencies: run with `node server.js`.
 //
 // - Serves the pages in /public (clean URLs: /trips -> trips.html).
 // - Stores trips, accounts and reservations as JSON files in DATA_DIR (default ./data).
@@ -28,7 +28,7 @@ const DATA = path.resolve(ROOT, env('DATA_DIR', 'data'));
 const ADMIN_DOMAIN = env('ADMIN_DOMAIN', 'ce-tee.com').toLowerCase().replace(/^@/, '');
 const SESSION_SECRET = env('SESSION_SECRET');
 const RESEND_API_KEY = env('RESEND_API_KEY');
-const MAIL_FROM = env('MAIL_FROM', 'CE & Tees <hello@' + ADMIN_DOMAIN + '>');
+const MAIL_FROM = env('MAIL_FROM', 'CE & Tee <hello@' + ADMIN_DOMAIN + '>');
 const STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET');
 const SITE_URL = env('SITE_URL').replace(/\/$/, '');
@@ -158,8 +158,8 @@ async function sendMail(to, subject, text) {
   });
   if (!r.ok) console.error('Email failed:', r.status, await r.text().catch(() => ''));
 }
-const sendVerify = (req, u) => sendMail(u.email, 'Confirm your CE & Tees account',
-  `Hi ${u.name.split(' ')[0]},\n\nConfirm your email to finish setting up your CE & Tees account:\n\n${baseUrl(req)}/account?verify=${issueToken(u.id, 'verify', 48)}\n\nThis link works for 48 hours. If you didn't sign up, you can ignore this email.`);
+const sendVerify = (req, u) => sendMail(u.email, 'Confirm your CE & Tee account',
+  `Hi ${u.name.split(' ')[0]},\n\nConfirm your email to finish setting up your CE & Tee account:\n\n${baseUrl(req)}/account?verify=${issueToken(u.id, 'verify', 48)}\n\nThis link works for 48 hours. If you didn't sign up, you can ignore this email.`);
 
 // ---- helpers ---------------------------------------------------------------
 const send = (res, status, body, headers = {}) => {
@@ -273,7 +273,7 @@ async function api(req, res, url) {
     const b = await jsonBody(req) || {};
     const u = read('users').find((x) => x.email === normEmail(b.email));
     if (u) {
-      await sendMail(u.email, 'Reset your CE & Tees password',
+      await sendMail(u.email, 'Reset your CE & Tee password',
         `Hi ${u.name.split(' ')[0]},\n\nUse this link to choose a new password:\n\n${baseUrl(req)}/account?reset=${issueToken(u.id, 'reset', 1)}\n\nIt works for one hour. If you didn't ask for this, you can ignore this email.`);
     }
     return send(res, 200, { ok: true });   // same answer either way, so emails can't be probed
@@ -496,7 +496,7 @@ http.createServer(async (req, res) => {
     if (!res.headersSent) send(res, 500, { error: 'Something went wrong.' });
   }
 }).listen(PORT, () => {
-  console.log(`CE & Tees running at http://localhost:${PORT}`);
+  console.log(`CE & Tee running at http://localhost:${PORT}`);
   console.log(`Data folder:  ${DATA}`);
   console.log(`Admins:       verified @${ADMIN_DOMAIN} accounts`);
   console.log(`Email:        ${RESEND_API_KEY ? 'sending through Resend' : 'printed here in the log (RESEND_API_KEY not set)'}`);

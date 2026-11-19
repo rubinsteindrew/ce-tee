@@ -1,4 +1,4 @@
-/* CE & Tees — account page: sign in, create account, confirm email, reset password, member area. */
+/* CE & Tee — account page: sign in, create account, confirm email, reset password, member area. */
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -37,7 +37,7 @@
     $('#tabIn').setAttribute('aria-selected', String(!up));
     $('#tabUp').setAttribute('aria-selected', String(up));
     $('#formIn').hidden = up; $('#formUp').hidden = !up;
-    $('#authTitle').textContent = up ? 'Join CE & Tees' : 'Welcome back';
+    $('#authTitle').textContent = up ? 'Join CE & Tee' : 'Welcome back';
     $('#authSub').textContent = up ? 'Create a free account to reserve trips and keep your course records together.' : 'Sign in to see and manage your trips.';
   }
   $('#tabIn').addEventListener('click', () => setTab(false));
@@ -150,7 +150,7 @@
     if (user) { if (next) location.href = next; else signedIn(user); }
     else {
       signedOut();
-      if (next === '/admin') notice($('#notice'), 'Sign in with your CE &amp; Tees staff account to open the admin pages.');
+      if (next === '/admin') notice($('#notice'), 'Sign in with your CE &amp; Tee staff account to open the admin pages.');
       else if (next) notice($('#notice'), 'Sign in or create a free account to reserve your spot.');
     }
   })();

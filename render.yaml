@@ -22,7 +22,7 @@ services:
       - key: SITE_URL
         value: https://ce-tee.com
       - key: MAIL_FROM
-        value: CE & Tees <hello@ce-tee.com>
+        value: CE & Tee <hello@ce-tee.com>
       - key: RESEND_API_KEY
         sync: false          # filled in on Render, never committed
       - key: STRIPE_SECRET_KEY

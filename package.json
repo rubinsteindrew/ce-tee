@@ -2,7 +2,7 @@
   "name": "ce-tee",
   "private": true,
   "version": "1.0.0",
-  "description": "CE & Tees website: golf trips with dental continuing education",
+  "description": "CE & Tee website: golf trips with dental continuing education",
   "scripts": {
     "start": "node server.js"
   },
