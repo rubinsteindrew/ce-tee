@@ -45,6 +45,14 @@
   $('#toForgot').addEventListener('click', () => { showPane('forgot'); $('#formForgot').email.value = $('#formIn').email.value; });
   document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => { showPane('tabs'); setTab(false); }));
 
+  const GOOGLE_ERRORS = {
+    'google-off': 'Google sign-in isn’t switched on yet. Use your email for now.',
+    'google-cancelled': 'Google sign-in was cancelled.',
+    'google-state': 'That Google sign-in expired. Please try again.',
+    'google-unverified': 'Google hasn’t confirmed that email address, so we can’t use it to sign in.',
+    'google-failed': 'Google sign-in didn’t work. Please try again, or use your email.',
+  };
+
   function signedIn(user, msg) {
     if (next) { location.href = next; return; }
     authView.hidden = true; memberView.hidden = false;
@@ -52,7 +60,10 @@
     $('#adminLink').hidden = !user.admin;
     const p = $('#formProfile');
     p.name.value = user.name; p.email.value = user.email; p.practice.value = user.practice; p.phone.value = user.phone;
-    $('#emailState').textContent = user.verified ? '· confirmed' : '· not confirmed yet';
+    $('#emailState').textContent = user.google ? '· via Google' : user.verified ? '· confirmed' : '· not confirmed yet';
+    $('#pwCurrent').hidden = !user.hasPassword; $('#pwNote').hidden = user.hasPassword;
+    $('#formPassword').current.required = user.hasPassword;
+    $('#formPassword').querySelector('[type=submit] span').textContent = user.hasPassword ? 'Change password' : 'Set a password';
     const acct = $('#navAcct'); acct.textContent = user.name.split(' ')[0]; acct.classList.add('in');
     if (msg) notice($('#memberNotice'), esc(msg), true);
     else if (!user.verified) {
@@ -146,7 +157,9 @@
       try { const { user } = await call('POST', '/api/auth/verify', { token: q.get('verify') }); clean(); signedIn(user, 'Your email is confirmed. Thanks!'); return; }
       catch (ex) { clean(); notice($('#notice'), esc(ex.message) + ' Sign in to send a new one.'); }
     }
-    const { user } = await call('GET', '/api/auth/me').catch(() => ({ user: null }));
+    const { user, google } = await call('GET', '/api/auth/me').catch(() => ({ user: null }));
+    if (google) { $('#googleBox').hidden = false; if (next) $('#googleBtn').href = '/api/auth/google?next=' + encodeURIComponent(next); }
+    if (q.get('error')) { notice($('#notice'), esc(GOOGLE_ERRORS[q.get('error')] || 'Sign-in didn’t work. Please try again.')); clean(); }
     if (user) { if (next) location.href = next; else signedIn(user); }
     else {
       signedOut();

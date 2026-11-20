@@ -32,6 +32,8 @@ const MAIL_FROM = env('MAIL_FROM', 'CE & Tee <hello@' + ADMIN_DOMAIN + '>');
 const STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET');
 const SITE_URL = env('SITE_URL').replace(/\/$/, '');
+const GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID');
+const GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET');
 const SESSION_DAYS = 30;
 // Deposit per spot, in dollars. A trip can set its own; one left at 0 uses this.
 const DEFAULT_DEPOSIT = Number(env('DEFAULT_DEPOSIT')) || 1000;
@@ -105,11 +107,11 @@ const publicTrip = (t) => {
 const normEmail = (e) => String(e || '').trim().toLowerCase();
 const validEmail = (e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e) && e.length <= 200;
 const isAdmin = (u) => !!u && u.verified && u.email.endsWith('@' + ADMIN_DOMAIN);
-const publicUser = (u) => u && ({ id: u.id, name: u.name, email: u.email, practice: u.practice || '', phone: u.phone || '', verified: !!u.verified, admin: isAdmin(u), createdAt: u.createdAt });
+const publicUser = (u) => u && ({ id: u.id, name: u.name, email: u.email, practice: u.practice || '', phone: u.phone || '', verified: !!u.verified, admin: isAdmin(u), google: !!u.googleId, hasPassword: !!u.hash, createdAt: u.createdAt });
 
 const scrypt = (password, salt) => new Promise((res, rej) => crypto.scrypt(password, salt, 64, { N: 16384, r: 8, p: 1 }, (e, k) => (e ? rej(e) : res(k.toString('hex')))));
 async function hashPassword(password) { const salt = crypto.randomBytes(16).toString('hex'); return { salt, hash: await scrypt(password, salt) }; }
-async function checkPassword(user, password) { const hash = await scrypt(password, user.salt); return safeEqual(hash, user.hash); }
+async function checkPassword(user, password) { if (!user.hash) return false; const hash = await scrypt(password, user.salt); return safeEqual(hash, user.hash); }
 const passwordProblem = (p) => (typeof p !== 'string' || p.length < 10 ? 'Use a password of at least 10 characters.' : p.length > 200 ? 'That password is too long.' : '');
 
 // sessions: signed cookie "userId.version.expiry.signature"; bumping a user's version signs them out everywhere
@@ -175,6 +177,13 @@ const readBody = (req, limit = 200_000) => new Promise((resolve, reject) => {
 const jsonBody = async (req) => { try { return JSON.parse((await readBody(req)).toString('utf8') || '{}'); } catch { return null; } };
 const safeEqual = (a, b) => crypto.timingSafeEqual(crypto.createHash('sha256').update(String(a)).digest(), crypto.createHash('sha256').update(String(b)).digest());
 const baseUrl = (req) => SITE_URL || `http://${req.headers.host}`;
+// Google must send people back to the host they started on (ce-tee.onrender.com, ce-tee.com or localhost),
+// and every one of those callback URLs has to be listed on the Google OAuth client.
+const googleRedirect = (req) => `${req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'}://${req.headers.host}/api/auth/google/callback`;
+const redirect = (res, location, cookies) => {
+  res.writeHead(302, { Location: location, 'Cache-Control': 'no-store', ...(cookies ? { 'Set-Cookie': cookies } : {}) });
+  res.end();
+};
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'trip';
 const clientIp = (req) => String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '';
 
@@ -215,7 +224,7 @@ async function api(req, res, url) {
   }
 
   // ---- auth ----
-  if (route === 'GET /api/auth/me') return send(res, 200, { user: publicUser(currentUser(req)) });
+  if (route === 'GET /api/auth/me') return send(res, 200, { user: publicUser(currentUser(req)), google: !!(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) });
 
   if (route === 'POST /api/auth/signup') {
     if (limited(req, 'signup', 8)) return send(res, 429, { error: 'Too many attempts. Try again in a few minutes.' });
@@ -242,12 +251,62 @@ async function api(req, res, url) {
     const email = normEmail(b.email);
     if (limited(req, 'login', 10) || limited(req, 'login:' + email, 6)) return send(res, 429, { error: 'Too many attempts. Try again in a few minutes.' });
     const user = read('users').find((u) => u.email === email);
+    if (user && !user.hash) return send(res, 401, { error: 'This account signs in with Google. Use the Google button above.' });
     const ok = user ? await checkPassword(user, String(b.password || '')) : (await scrypt('x', 'pad'), false);
     if (!ok) return send(res, 401, { error: 'That email and password don\'t match.' });
     return send(res, 200, { user: publicUser(user) }, { 'Set-Cookie': sessionCookie(req, user) });
   }
 
   if (route === 'POST /api/auth/logout') return send(res, 200, { ok: true }, { 'Set-Cookie': clearCookie(req) });
+
+  // ---- Sign in with Google (OAuth authorization-code flow, server side) ----
+  if (route === 'GET /api/auth/google') {
+    if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) return redirect(res, '/account?error=google-off');
+    const next = String(url.searchParams.get('next') || '');
+    const state = crypto.randomBytes(24).toString('hex');
+    const value = `${state}.${Buffer.from(/^\/(?!\/)/.test(next) ? next : '').toString('base64url')}`;
+    const q = new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID, redirect_uri: googleRedirect(req), response_type: 'code',
+      scope: 'openid email profile', state, prompt: 'select_account',
+    });
+    return redirect(res, 'https://accounts.google.com/o/oauth2/v2/auth?' + q,
+      `ce_oauth=${value}.${sign(value)}; HttpOnly; SameSite=Lax; Path=/api/auth/google; Max-Age=600${secureCookie(req)}`);
+  }
+
+  if (route === 'GET /api/auth/google/callback') {
+    const done = `ce_oauth=; HttpOnly; SameSite=Lax; Path=/api/auth/google; Max-Age=0${secureCookie(req)}`;
+    const fail = (why) => redirect(res, '/account?error=' + why, done);
+    const m = (req.headers.cookie || '').match(/(?:^|;\s*)ce_oauth=([^;]+)/);
+    const [state, nextB64, sig] = m ? m[1].split('.') : [];
+    if (!state || !safeEqual(sig, sign(`${state}.${nextB64}`)) || !safeEqual(state, url.searchParams.get('state') || '')) return fail('google-state');
+    if (url.searchParams.get('error') || !url.searchParams.get('code')) return fail('google-cancelled');
+    const r = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ code: url.searchParams.get('code'), client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET, redirect_uri: googleRedirect(req), grant_type: 'authorization_code' }),
+    });
+    const tok = await r.json().catch(() => ({}));
+    if (!r.ok || !tok.id_token) { console.error('Google token exchange failed:', r.status, tok.error || ''); return fail('google-failed'); }
+    // The ID token came straight from Google over TLS, so its claims can be read without re-checking the signature
+    // (Google's guidance for the server-side code flow); the audience, issuer and expiry are still checked.
+    let c; try { c = JSON.parse(Buffer.from(tok.id_token.split('.')[1], 'base64url').toString('utf8')); } catch { return fail('google-failed'); }
+    if (c.aud !== GOOGLE_CLIENT_ID || !['accounts.google.com', 'https://accounts.google.com'].includes(c.iss) || c.exp * 1000 < Date.now()) return fail('google-failed');
+    const email = normEmail(c.email);
+    if (!c.email_verified || !validEmail(email)) return fail('google-unverified');
+    const users = read('users');
+    let u = users.find((x) => x.googleId === c.sub) || users.find((x) => x.email === email);
+    if (!u) {
+      u = { id: crypto.randomUUID(), name: String(c.name || email.split('@')[0]).slice(0, 120), email, verified: true, sessionVersion: 0, createdAt: new Date().toISOString(), practice: '', phone: '' };
+      users.push(u);
+    } else if (!u.verified) {
+      // someone signed up with this address but never proved they own it; Google just did, so drop that unproven password
+      delete u.salt; delete u.hash; u.sessionVersion = (u.sessionVersion || 0) + 1;
+    }
+    Object.assign(u, { googleId: c.sub, verified: true });
+    if (!u.picture && c.picture) u.picture = String(c.picture).slice(0, 500);
+    write('users', users);
+    let next = ''; try { next = Buffer.from(nextB64 || '', 'base64url').toString('utf8'); } catch { /* ignore */ }
+    return redirect(res, /^\/(?!\/)/.test(next) ? next : '/account', [done, sessionCookie(req, u)]);
+  }
 
   if (route === 'POST /api/auth/verify') {
     const b = await jsonBody(req) || {};
@@ -314,7 +373,7 @@ async function api(req, res, url) {
     }
     if (route === 'POST /api/account/password') {
       const b = await jsonBody(req) || {};
-      if (!(await checkPassword(me, String(b.current || '')))) return send(res, 400, { error: 'Your current password is wrong.' });
+      if (me.hash && !(await checkPassword(me, String(b.current || '')))) return send(res, 400, { error: 'Your current password is wrong.' });
       const problem = passwordProblem(b.password);
       if (problem) return send(res, 400, { error: problem });
       const users = read('users'), u = users.find((x) => x.id === me.id);
@@ -500,5 +559,6 @@ http.createServer(async (req, res) => {
   console.log(`Data folder:  ${DATA}`);
   console.log(`Admins:       verified @${ADMIN_DOMAIN} accounts`);
   console.log(`Email:        ${RESEND_API_KEY ? 'sending through Resend' : 'printed here in the log (RESEND_API_KEY not set)'}`);
+  console.log(`Google:       ${GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET ? 'Sign in with Google is on' : 'off (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set)'}`);
   console.log(`Payments:     ${STRIPE_SECRET_KEY ? 'Stripe connected' : 'preview mode (STRIPE_SECRET_KEY not set)'}`);
 });
